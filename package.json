@@ -1,0 +1,28 @@
+{
+  "name": "the_rentall_company",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "aos": "^2.3.4",
+    "bootstrap": "^5.3.6",
+    "bootstrap-icons": "^1.13.1",
+    "jquery": "^3.7.1",
+    "next": "15.3.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "swiper": "^11.2.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.3"
+  }
+}

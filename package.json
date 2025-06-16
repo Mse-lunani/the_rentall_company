@@ -13,16 +13,24 @@
     "aos": "^2.3.4",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",
+    "datatables.net": "^2.3.1",
+    "datatables.net-dt": "^2.3.1",
     "jquery": "^3.7.1",
     "next": "15.3.3",
     "react": "^19.0.0",
+    "react-data-table-component": "^7.7.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "swiper": "^11.2.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/datatables.net": "^1.12.3",
+    "@types/jquery": "^3.5.32",
+    "@types/node": "22.15.29",
+    "@types/react": "19.1.6",
     "eslint": "^9",
-    "eslint-config-next": "15.3.3"
+    "eslint-config-next": "15.3.3",
+    "typescript": "5.8.3"
   }
 }

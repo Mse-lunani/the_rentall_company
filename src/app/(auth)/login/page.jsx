@@ -42,7 +42,7 @@ export default function LoginPage() {
                 <form
                   id="formAuthentication"
                   className="mb-3"
-                  action="/model/login.php"
+                  action="#"
                   method="POST"
                 >
                   {hasError && (

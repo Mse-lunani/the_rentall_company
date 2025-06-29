@@ -1,5 +1,5 @@
+"use client";
 import { useEffect, useRef } from "react";
-import { Modal } from "bootstrap";
 
 export default function ViewModal({ data, type }) {
   const modalRef = useRef();

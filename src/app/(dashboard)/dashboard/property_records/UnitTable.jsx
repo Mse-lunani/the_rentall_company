@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
-import ViewModal from "./ViewModal";
+import dynamic from "next/dynamic";
+
+const ViewModal = dynamic(() => import("./ViewModal"), { ssr: false });
 
 const fakeUnits = [
   {

@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function PaymentForm() {
+export default function PaymentForm({ initialData = null }) {
+  const router = useRouter();
   const [form, setForm] = useState({
     tenantId: "",
     amount: "",
@@ -11,76 +13,84 @@ export default function PaymentForm() {
 
   const [tenants, setTenants] = useState([]);
   const [selectedTenant, setSelectedTenant] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTenants();
+    fetch("/api/tenants")
+      .then((res) => res.json())
+      .then((data) => {
+        setTenants(data || []);
+      });
   }, []);
-  const fetchTenants = async () => {
-    const res = await fetch("/api/tenants");
-    const data = await res.json();
-    setTenants(data || []);
-    setLoading(false);
-  };
+
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        tenantId: initialData.tenant_id,
+        amount: initialData.amount_paid,
+        date: initialData.date_paid.substring(0, 10),
+        notes: initialData.notes || "",
+      });
+
+      const t = tenants.find((t) => t.id === initialData.tenant_id);
+      setSelectedTenant(t || null);
+    }
+  }, [initialData, tenants]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
 
     if (name === "tenantId") {
-      const tenant = tenants.find((t) => t.id === parseInt(value));
-      setSelectedTenant(tenant || null);
+      const t = tenants.find((t) => t.id === parseInt(value));
+      setSelectedTenant(t || null);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      tenant_id: form.tenantId,
+      amount_paid: parseFloat(form.amount),
+      date_paid: form.date,
+      notes: form.notes,
+    };
 
-    const res = await fetch("/api/payments", {
-      method: "POST",
+    const method = initialData ? "PATCH" : "POST";
+    const url = initialData
+      ? `/api/payments?id=${initialData.id}`
+      : "/api/payments";
+
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tenant_id: form.tenantId,
-        amount_paid: parseFloat(form.amount),
-        date_paid: form.date,
-        notes: form.notes,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const result = await res.json();
     if (res.ok) {
-      alert("Payment recorded successfully");
-      setForm({
-        tenantId: "",
-        amount: "",
-        date: new Date().toISOString().substring(0, 10),
-        notes: "",
-      });
-      setSelectedTenant(null);
+      alert(`Payment ${initialData ? "updated" : "added"} successfully`);
+      router.push("/dashboard/payments");
     } else {
-      alert(result.error || "Failed to record payment");
+      alert(result.error || "Failed");
     }
   };
 
   const paid = parseFloat(form.amount || 0);
   const rent = selectedTenant?.rent_amount_kes || 0;
-  const difference = paid - rent;
+  const diff = paid - rent;
 
-  let statusMessage = "";
-  let badgeClass = "";
-
-  if (paid > 0 && selectedTenant) {
-    if (difference === 0) {
-      statusMessage = `Paid exact rent (Ksh ${rent.toLocaleString()})`;
-      badgeClass = "bg-success";
-    } else if (difference < 0) {
-      statusMessage = `Underpayment by Ksh ${Math.abs(
-        difference
-      ).toLocaleString()}`;
-      badgeClass = "bg-warning";
+  let badge = "",
+    msg = "";
+  if (paid > 0 && rent) {
+    if (diff === 0) {
+      badge = "bg-success";
+      msg = `Paid exact (Ksh ${rent})`;
+    } else if (diff < 0) {
+      badge = "bg-warning";
+      msg = `Underpaid by Ksh ${Math.abs(diff)}`;
     } else {
-      statusMessage = `Overpayment by Ksh ${difference.toLocaleString()}`;
-      badgeClass = "bg-danger";
+      badge = "bg-danger";
+      msg = `Overpaid by Ksh ${diff}`;
     }
   }
 
@@ -89,7 +99,7 @@ export default function PaymentForm() {
       onSubmit={handleSubmit}
       className="card card-primary p-4 shadow rounded"
     >
-      <h4 className="mb-3">Record Tenant Payment</h4>
+      <h4 className="mb-3">{initialData ? "Edit Payment" : "Add Payment"}</h4>
 
       <div className="form-group mb-3">
         <label>Tenant</label>
@@ -109,16 +119,6 @@ export default function PaymentForm() {
         </select>
       </div>
 
-      {selectedTenant && (
-        <div className="mb-2">
-          <p>
-            <strong>Assigned Unit:</strong> {selectedTenant.unit_name || "N/A"}{" "}
-            <br />
-            <strong>Expected Rent:</strong> Ksh {rent.toLocaleString()}
-          </p>
-        </div>
-      )}
-
       <div className="form-group mb-3">
         <label>Amount Paid</label>
         <input
@@ -131,11 +131,7 @@ export default function PaymentForm() {
         />
       </div>
 
-      {statusMessage && (
-        <div className="mb-3">
-          <span className={`badge ${badgeClass} p-2`}>{statusMessage}</span>
-        </div>
-      )}
+      {msg && <span className={`badge ${badge} mb-3 p-2`}>{msg}</span>}
 
       <div className="form-group mb-3">
         <label>Date Paid</label>
@@ -150,7 +146,7 @@ export default function PaymentForm() {
       </div>
 
       <div className="form-group mb-4">
-        <label>Notes (optional)</label>
+        <label>Notes</label>
         <input
           type="text"
           name="notes"
@@ -160,8 +156,8 @@ export default function PaymentForm() {
         />
       </div>
 
-      <button className="btn btn-primary" disabled={loading}>
-        Submit Payment
+      <button className="btn btn-primary">
+        {initialData ? "Update" : "Submit"}
       </button>
     </form>
   );

@@ -1,12 +1,21 @@
 "use client";
 
-export default function TenantTable({ tenants, onView }) {
+import { on } from "events";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+export default function TenantTable({ tenants, onView, onDelete }) {
+  const router = useRouter();
+  console.log("Tenants:", tenants);
   const handleView = (tenant) => {
     onView(tenant);
     const modal = new bootstrap.Modal(
       document.getElementById("viewTenantModal")
     );
     modal.show();
+  };
+  const handleDelete = async (id) => {
+    onDelete(id);
   };
 
   return (
@@ -22,7 +31,7 @@ export default function TenantTable({ tenants, onView }) {
               <th>Full Name</th>
               <th>Phone</th>
               <th>Unit</th>
-              <th>Status</th>
+              <th>Building</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -30,18 +39,10 @@ export default function TenantTable({ tenants, onView }) {
             {tenants.map((tenant, index) => (
               <tr key={tenant.id}>
                 <td>{index + 1}</td>
-                <td>{tenant.fullName}</td>
+                <td>{tenant.full_name}</td>
                 <td>{tenant.phone}</td>
-                <td>{tenant.unit}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      tenant.status === "Active" ? "bg-success" : "bg-secondary"
-                    }`}
-                  >
-                    {tenant.status}
-                  </span>
-                </td>
+                <td>{tenant.unit_number}</td>
+                <td>{tenant.building_name || "N/A"}</td>
                 <td>
                   <button
                     className="btn btn-sm btn-info me-1"
@@ -49,10 +50,16 @@ export default function TenantTable({ tenants, onView }) {
                   >
                     View
                   </button>
-                  <button className="btn btn-sm btn-warning me-1" disabled>
+                  <Link
+                    href={`/dashboard/tenants/edit/${tenant.id}`}
+                    className="btn btn-warning btn-sm"
+                  >
                     Edit
-                  </button>
-                  <button className="btn btn-sm btn-danger" disabled>
+                  </Link>{" "}
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDelete(tenant.id)}
+                  >
                     Delete
                   </button>
                 </td>

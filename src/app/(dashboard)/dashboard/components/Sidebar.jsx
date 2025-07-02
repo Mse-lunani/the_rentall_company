@@ -180,7 +180,7 @@ export default function Sidebar() {
         </li>
         {/* logout */}
         <li className={`menu-item`}>
-          <Link href="/login" className="menu-link">
+          <Link href="/api/logout" className="menu-link">
             <i className="menu-icon tf-icons bx bx-lock" />
             <div data-i18n="logout">Logout</div>
           </Link>

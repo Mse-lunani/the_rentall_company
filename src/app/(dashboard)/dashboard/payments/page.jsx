@@ -1,24 +1,27 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState([
-    {
-      id: 1,
-      tenant: "Alice Wanjiku",
-      amount: 15000,
-      date: "2025-06-28",
-      notes: "June Rent",
-    },
-    {
-      id: 2,
-      tenant: "John Otieno",
-      amount: 6000,
-      date: "2025-06-20",
-      notes: "Partial (June)",
-    },
-  ]);
+  const [payments, setPayments] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const fetchPayments = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/payments");
+      const data = await res.json();
+      setPayments(data || []);
+    } catch (error) {
+      console.error("Failed to fetch payments:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+  const handleDelete = async (id) => {};
 
   return (
     <div className="content-wrapper">
@@ -40,16 +43,31 @@ export default function PaymentsPage() {
                   <th>Amount (Ksh)</th>
                   <th>Date</th>
                   <th>Notes</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((p, index) => (
                   <tr key={p.id}>
                     <td>{index + 1}</td>
-                    <td>{p.tenant}</td>
-                    <td>{p.amount.toLocaleString()}</td>
-                    <td>{p.date}</td>
+                    <td>{p.full_name}</td>
+                    <td>{p.amount_paid.toLocaleString()}</td>
+                    <td>{p.date_paid}</td>
                     <td>{p.notes}</td>
+                    <td>
+                      <Link
+                        href={`/dashboard/payments/edit/${p.id}`}
+                        className="btn btn-sm btn-success me-2"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(tenant.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
                 {payments.length === 0 && (

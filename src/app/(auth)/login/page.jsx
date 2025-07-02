@@ -42,7 +42,7 @@ export default function LoginPage() {
                 <form
                   id="formAuthentication"
                   className="mb-3"
-                  action="#"
+                  action="/api/login"
                   method="POST"
                 >
                   {hasError && (

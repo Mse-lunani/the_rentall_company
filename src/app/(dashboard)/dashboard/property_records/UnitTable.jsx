@@ -1,40 +1,50 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const ViewModal = dynamic(() => import("./ViewModal"), { ssr: false });
 
-const fakeUnits = [
-  {
-    id: 1,
-    name: "Unit A3",
-    bedrooms: 2,
-    bathrooms: 1,
-    dsq: true,
-    floor: 3,
-    rent: 25000,
-    deposit: 25000,
-    space: 85,
-    amenities: "WiFi, Parking",
-    building: "Sky View Towers",
-  },
-  {
-    id: 2,
-    name: "Unit B2",
-    bedrooms: 1,
-    bathrooms: 1,
-    dsq: false,
-    floor: 1,
-    rent: 15000,
-    deposit: 15000,
-    space: 45,
-    amenities: "Balcony",
-    building: "Standalone",
-  },
-];
-
 export default function UnitTable() {
+  const [units, setUnits] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUnits();
+  }, []);
+
+  const fetchUnits = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/property-records");
+      const data = await res.json();
+      setUnits(data.units || []);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      console.error("Failed to fetch units:", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    const confirm = window.confirm(
+      "Are you sure you want to delete this building?"
+    );
+    if (!confirm) return;
+
+    const res = await fetch(`/api/units?id=${id}`, { method: "DELETE" });
+    const result = await res.json();
+
+    if (!res.ok) {
+      setLoading(false);
+      alert(result.error || "Delete failed");
+      return;
+    }
+    alert("Deleted successfully");
+    fetchUnits();
+  };
 
   return (
     <>
@@ -52,6 +62,7 @@ export default function UnitTable() {
                 <th>Bathrooms</th>
                 <th>DSQ</th>
                 <th>Floor</th>
+                <th>Amenities</th>
                 <th>Rent</th>
                 <th>Deposit</th>
                 <th>Space</th>
@@ -60,18 +71,19 @@ export default function UnitTable() {
               </tr>
             </thead>
             <tbody>
-              {fakeUnits.map((u, i) => (
+              {units.map((u, i) => (
                 <tr key={u.id}>
                   <td>{i + 1}</td>
                   <td>{u.name}</td>
                   <td>{u.bedrooms}</td>
                   <td>{u.bathrooms}</td>
                   <td>{u.dsq ? "Yes" : "No"}</td>
-                  <td>{u.floor}</td>
-                  <td>{u.rent.toLocaleString()}</td>
-                  <td>{u.deposit.toLocaleString()}</td>
-                  <td>{u.space}</td>
-                  <td>{u.building}</td>
+                  <td>{u.floor_number}</td>
+                  <td>{u.amenities}</td>
+                  <td>{u.rent_amount_kes.toLocaleString()}</td>
+                  <td>{u.deposit_amount_kes.toLocaleString()}</td>
+                  <td>{u.space_sqm}</td>
+                  <td>{u.building_name}</td>
                   <td>
                     <button
                       className="btn btn-info btn-sm"
@@ -79,8 +91,19 @@ export default function UnitTable() {
                     >
                       View
                     </button>{" "}
-                    <button className="btn btn-warning btn-sm">Edit</button>{" "}
-                    <button className="btn btn-danger btn-sm">Delete</button>
+                    <Link
+                      href={`/dashboard/property_records/units/edit/${u.id}`}
+                      className="btn btn-warning btn-sm"
+                    >
+                      Edit
+                    </Link>{" "}
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(u.id)}
+                      disabled={loading}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

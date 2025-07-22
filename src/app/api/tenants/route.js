@@ -1,5 +1,7 @@
 import { insertRow, updateRow, deleteRow } from "../../../lib/db.js";
 import { neon } from "@neondatabase/serverless";
+import crypto from "crypto";
+
 const sql = neon(process.env.DATABASE_URL);
 export async function POST(req) {
   const body = await req.json();
@@ -10,6 +12,10 @@ export async function POST(req) {
   }
 
   try {
+    // Generate random password (1000-9999)
+    const randomPassword = Math.floor(Math.random() * 9000) + 1000;
+    const passwordHash = crypto.createHash("md5").update(randomPassword.toString()).digest("hex");
+
     const tenant = await insertRow(
       "tenants",
       {
@@ -17,11 +23,13 @@ export async function POST(req) {
         phone,
         email,
         unit_id,
+        password: passwordHash,
+        password_text: randomPassword.toString()
       },
       "id"
     );
 
-    return Response.json({ success: true, tenant_id: tenant.id });
+    return Response.json({ success: true, tenant_id: tenant.id, password: randomPassword });
   } catch (error) {
     return Response.json(
       { error: "Failed to add tenant", details: error.message },
@@ -36,7 +44,7 @@ export async function GET(req) {
   if (!id || isNaN(id)) {
     try {
       const tenants = await sql`
-      SELECT t.id, t.full_name, t.phone, t.email, u.name as unit_number, u.name as unit_name, u.rent_amount_kes, b.name AS building_name
+      SELECT t.id, t.full_name, t.phone, t.email, t.password_text, u.name as unit_number, u.name as unit_name, u.rent_amount_kes, b.name AS building_name
       FROM tenants t
       JOIN units u ON t.unit_id = u.id
       JOIN buildings b ON u.building_id = b.id
@@ -53,8 +61,8 @@ export async function GET(req) {
   } else {
     //get single tenant
     try {
-      const tenant = await await sql`
-            SELECT t.id, t.full_name, t.phone, t.email, u.name as unit_number, u.id as unit_id, b.name AS building_name
+      const tenant = await sql`
+            SELECT t.id, t.full_name, t.phone, t.email, t.password_text, u.name as unit_number, u.id as unit_id, b.name AS building_name
             FROM tenants t
             JOIN units u ON t.unit_id = u.id
             JOIN buildings b ON u.building_id = b.id
@@ -84,6 +92,19 @@ export async function PATCH(req) {
   const data = await req.json();
 
   try {
+    // Check if password regeneration is requested
+    if (data.regenerate_password) {
+      const randomPassword = Math.floor(Math.random() * 9000) + 1000;
+      const passwordHash = crypto.createHash("md5").update(randomPassword.toString()).digest("hex");
+      
+      data.password = passwordHash;
+      data.password_text = randomPassword.toString();
+      delete data.regenerate_password;
+      
+      await updateRow("tenants", data, { id: Number(id) });
+      return Response.json({ success: true, password: randomPassword });
+    }
+    
     await updateRow("tenants", data, { id: Number(id) });
     return Response.json({ success: true });
   } catch (err) {

@@ -32,6 +32,7 @@ export default function TenantTable({ tenants, onView, onDelete }) {
               <th>Phone</th>
               <th>Unit</th>
               <th>Building</th>
+              <th>Password</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -44,18 +45,27 @@ export default function TenantTable({ tenants, onView, onDelete }) {
                 <td>{tenant.unit_number}</td>
                 <td>{tenant.building_name || "N/A"}</td>
                 <td>
+                  <code className="text-success">{tenant.password_text || "N/A"}</code>
+                </td>
+                <td>
+                  <Link
+                    href={`/dashboard/tenants/${tenant.id}`}
+                    className="btn btn-primary btn-sm me-1"
+                  >
+                    Profile
+                  </Link>
                   <button
                     className="btn btn-sm btn-info me-1"
                     onClick={() => handleView(tenant)}
                   >
-                    View
+                    Details
                   </button>
                   <Link
                     href={`/dashboard/tenants/edit/${tenant.id}`}
-                    className="btn btn-warning btn-sm"
+                    className="btn btn-warning btn-sm me-1"
                   >
                     Edit
-                  </Link>{" "}
+                  </Link>
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => handleDelete(tenant.id)}

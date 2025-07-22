@@ -8,7 +8,6 @@ export default function PropertyRecordsPage() {
         <div className="container-xxl flex-grow-1 container-p-y">
           <h1>Property Records</h1>
           <BuildingTable />
-          <UnitTable />
         </div>
       </section>
     </div>

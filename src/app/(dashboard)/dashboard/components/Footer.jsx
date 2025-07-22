@@ -1,6 +1,5 @@
 // src/app/dashboard/components/Footer.jsx
 import React from "react";
-import Script from "next/script";
 
 export default function Footer() {
   return (
@@ -33,56 +32,40 @@ export default function Footer() {
       </footer>
 
       {/* ── Core JS (Bottom of Body) ───────────────────────────────────── */}
-      <Script
-        src="/assets/vendor/libs/jquery/jquery.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/popper/popper.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/js/bootstrap.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/hammer/hammer.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/i18n/i18n.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/typeahead-js/typeahead.js"
-        strategy="afterInteractive"
-      />
-      <Script src="/assets/vendor/js/menu.js" strategy="afterInteractive" />
+      <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+      <script src="/assets/vendor/libs/popper/popper.js"></script>
+      <script src="/assets/vendor/js/bootstrap.js"></script>
+      <script src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+      <script src="/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+      <script src="/assets/vendor/libs/hammer/hammer.js"></script>
+      <script src="/assets/vendor/libs/i18n/i18n.js"></script>
+      <script src="/assets/vendor/libs/typeahead-js/typeahead.js"></script>
+      <script src="/assets/vendor/js/menu.js"></script>
 
       {/* ── Vendors JS ─────────────────────────────────────────────────── */}
-      <Script
-        src="/assets/vendor/libs/apex-charts/apexcharts.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="/assets/vendor/libs/toastr/toastr.js"
-        strategy="afterInteractive"
-      />
+      <script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+      <script src="/assets/vendor/libs/toastr/toastr.js"></script>
 
       {/* ── Main JS ─────────────────────────────────────────────────────── */}
-      <Script src="/assets/js/main.js" strategy="afterInteractive" />
-
-      {/* ── Page-Specific JS ───────────────────────────────────────────── */}
-      <Script src="/assets/js/dashboards-crm.js" strategy="afterInteractive" />
-      <Script src="/assets/js/mytable.js" strategy="afterInteractive" />
+      <script>
+        {`
+          document.addEventListener('DOMContentLoaded', function() {
+            // Load main.js after DOM is ready
+            const mainScript = document.createElement('script');
+            mainScript.src = '/assets/js/main.js';
+            document.body.appendChild(mainScript);
+            
+            // Load page-specific scripts
+            const crmScript = document.createElement('script');
+            crmScript.src = '/assets/js/dashboards-crm.js';
+            document.body.appendChild(crmScript);
+            
+            const tableScript = document.createElement('script');
+            tableScript.src = '/assets/js/mytable.js';
+            document.body.appendChild(tableScript);
+          });
+        `}
+      </script>
     </>
   );
 }

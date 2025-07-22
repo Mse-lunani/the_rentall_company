@@ -14,6 +14,18 @@ export default function BuildingTable() {
     fetchBuildings();
   }, []);
 
+  // Initialize DataTable after buildings load
+  useEffect(() => {
+    if (!loading && Buildings.length > 0) {
+      // Wait a bit for DOM to update, then call global DataTable function
+      setTimeout(() => {
+        if (window.initDataTable) {
+          window.initDataTable();
+        }
+      }, 100);
+    }
+  }, [loading, Buildings]);
+
   const fetchBuildings = async () => {
     try {
       setLoading(true);
@@ -49,16 +61,14 @@ export default function BuildingTable() {
   return (
     <>
       <div className="card">
-        <div className="card-header">
-          <h3 className="card-title">Building Records</h3>
-        </div>
         <div className="card-body table-responsive">
-          <table className="table table-bordered table-striped">
+          <table className="table table-bordered table-striped datatables-basic" data-name="Building Records">
             <thead>
               <tr>
                 <th>#</th>
                 <th>Name</th>
                 <th>Type</th>
+                <th>Owner</th>
                 <th>Units</th>
                 <th>Space (sqm)</th>
                 <th>Occupancy</th>
@@ -71,22 +81,40 @@ export default function BuildingTable() {
                   <td>{i + 1}</td>
                   <td>{b.name}</td>
                   <td>{b.type}</td>
+                  <td>
+                    {b.owner_name ? (
+                      <Link
+                        href={`/dashboard/owners/${b.owner_id}`}
+                        className="text-primary"
+                      >
+                        {b.owner_name}
+                      </Link>
+                    ) : (
+                      <span className="text-muted">Unassigned</span>
+                    )}
+                  </td>
                   <td>{b.units_owned}</td>
                   <td>{b.total_space_sqm}</td>
                   <td>{b.occupancy_status}</td>
                   <td>
+                    <Link
+                      href={`/dashboard/property_records/buildings/${b.id}`}
+                      className="btn btn-primary btn-sm me-1"
+                    >
+                      View Units
+                    </Link>
                     <button
-                      className="btn btn-info btn-sm"
+                      className="btn btn-info btn-sm me-1"
                       onClick={() => setSelected(b)}
                     >
-                      View
-                    </button>{" "}
+                      Details
+                    </button>
                     <Link
                       href={`/dashboard/property_records/buildings/edit/${b.id}`}
-                      className="btn btn-warning btn-sm"
+                      className="btn btn-warning btn-sm me-1"
                     >
                       Edit
-                    </Link>{" "}
+                    </Link>
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => handleDelete(b.id)}

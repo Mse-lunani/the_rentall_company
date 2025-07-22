@@ -17522,7 +17522,6 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 
 .menu-toggle::after {
-  content: "";
   position: absolute;
   top: 50%;
   display: block;

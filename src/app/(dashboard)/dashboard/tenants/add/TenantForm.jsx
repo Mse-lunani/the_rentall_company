@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import TenantUnitSelect from "../../components/TenantUnitSelect";
 
 export default function TenantForm({ initialData = null }) {
   const router = useRouter();
@@ -15,9 +16,22 @@ export default function TenantForm({ initialData = null }) {
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState(null);
+  const [showOccupiedUnits, setShowOccupiedUnits] = useState(false);
 
   useEffect(() => {
-    fetch("/api/property-records")
+    const params = new URLSearchParams();
+    if (showOccupiedUnits) {
+      params.append("include_occupied", "true");
+    }
+    if (initialData?.id) {
+      params.append("current_tenant_id", initialData.id);
+    }
+
+    const queryString = params.toString();
+    const url = `/api/property-records${queryString ? `?${queryString}` : ""}`;
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setUnits(data.units || []);
@@ -31,12 +45,58 @@ export default function TenantForm({ initialData = null }) {
         email: initialData.email || "",
         unit: initialData.unit_id || "",
       });
+      setGeneratedPassword(initialData.password_text || null);
     }
   }, [initialData]);
+
+  // Refetch units when showOccupiedUnits changes
+  useEffect(() => {
+    if (!loading) {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (showOccupiedUnits) {
+        params.append("include_occupied", "true");
+      }
+      if (initialData?.id) {
+        params.append("current_tenant_id", initialData.id);
+      }
+
+      const queryString = params.toString();
+      const url = `/api/property-records${
+        queryString ? `?${queryString}` : ""
+      }`;
+
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          setUnits(data.units || []);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }
+  }, [showOccupiedUnits]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegeneratePassword = async () => {
+    if (!initialData) return;
+
+    const res = await fetch(`/api/tenants?id=${initialData.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ regenerate_password: true }),
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      setGeneratedPassword(result.password);
+      alert(`New password generated: ${result.password}`);
+    } else {
+      alert(result.error || "Failed to regenerate password");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -64,7 +124,14 @@ export default function TenantForm({ initialData = null }) {
 
     const result = await res.json();
     if (res.ok) {
-      alert(`Tenant ${initialData ? "updated" : "added"} successfully`);
+      if (!initialData && result.password) {
+        setGeneratedPassword(result.password);
+        alert(
+          `Tenant added successfully! Generated password: ${result.password}`
+        );
+      } else {
+        alert(`Tenant ${initialData ? "updated" : "added"} successfully`);
+      }
       router.push("/dashboard/tenants");
       if (!initialData) {
         setFormData({ fullName: "", phone: "", email: "", unit: "" });
@@ -121,22 +188,74 @@ export default function TenantForm({ initialData = null }) {
           </div>
           <div className="form-group">
             <label htmlFor="unit">Assigned Unit</label>
-            <select
-              className="form-control"
-              id="unit"
-              name="unit"
-              value={formData.unit}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select a unit</option>
-              {units.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name}
-                </option>
-              ))}
-            </select>
+            <div className="mb-2">
+              <button
+                type="button"
+                className={`btn btn-sm ${
+                  showOccupiedUnits ? "btn-warning" : "btn-outline-secondary"
+                }`}
+                onClick={() => setShowOccupiedUnits(!showOccupiedUnits)}
+              >
+                {showOccupiedUnits
+                  ? "Hide Occupied Units"
+                  : "Show Occupied Units Too"}
+              </button>
+              <small className="text-muted ml-3">
+                {showOccupiedUnits
+                  ? "Showing all units"
+                  : "Showing available units only"}
+              </small>
+            </div>
+            {loading ? (
+              <div className="form-control d-flex align-items-center">
+                <span>Loading units...</span>
+              </div>
+            ) : (
+              <TenantUnitSelect
+                units={units}
+                value={formData.unit}
+                onChange={handleChange}
+                required={true}
+                placeholder="Select a unit"
+                id="unit"
+              />
+            )}
           </div>
+
+          {/* Password Display Section */}
+          {(generatedPassword || initialData) && (
+            <div className="form-group">
+              <label>Login Password</label>
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control font-weight-bold"
+                  value={generatedPassword || "****"}
+                  readOnly
+                  style={{
+                    fontFamily: "monospace",
+                    backgroundColor: "#f8f9fa",
+                    border: "2px solid #28a745",
+                  }}
+                />
+                {initialData && (
+                  <div className="input-group-append">
+                    <button
+                      type="button"
+                      className="btn btn-warning"
+                      onClick={handleRegeneratePassword}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      Regenerate
+                    </button>
+                  </div>
+                )}
+              </div>
+              <small className="text-muted">
+                This password will be used for tenant login access.
+              </small>
+            </div>
+          )}
         </div>
         <div className="card-footer">
           <button

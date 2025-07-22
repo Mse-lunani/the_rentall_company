@@ -14,6 +14,17 @@ export default function UnitTable() {
     fetchUnits();
   }, []);
 
+  // Initialize DataTable after units load
+  useEffect(() => {
+    if (!loading && units.length > 0) {
+      setTimeout(() => {
+        if (window.initDataTable) {
+          window.initDataTable();
+        }
+      }, 100);
+    }
+  }, [loading, units]);
+
   const fetchUnits = async () => {
     try {
       setLoading(true);
@@ -49,23 +60,19 @@ export default function UnitTable() {
   return (
     <>
       <div className="card mt-4">
-        <div className="card-header">
-          <h3 className="card-title">Unit Records</h3>
-        </div>
         <div className="card-body table-responsive">
-          <table className="table table-bordered table-striped">
+          <table
+            className="table table-bordered table-striped datatables-basic"
+            data-name="Unit Records"
+          >
             <thead>
               <tr>
                 <th>#</th>
                 <th>Unit</th>
+                <th>Owner</th>
                 <th>Bedrooms</th>
                 <th>Bathrooms</th>
-                <th>DSQ</th>
-                <th>Floor</th>
-                <th>Amenities</th>
                 <th>Rent</th>
-                <th>Deposit</th>
-                <th>Space</th>
                 <th>Building</th>
                 <th>Actions</th>
               </tr>
@@ -75,14 +82,21 @@ export default function UnitTable() {
                 <tr key={u.id}>
                   <td>{i + 1}</td>
                   <td>{u.name}</td>
+                  <td>
+                    {u.owner_name ? (
+                      <Link
+                        href={`/dashboard/owners/${u.owner_id}`}
+                        className="text-primary"
+                      >
+                        {u.owner_name}
+                      </Link>
+                    ) : (
+                      <span className="text-muted">Unassigned</span>
+                    )}
+                  </td>
                   <td>{u.bedrooms}</td>
                   <td>{u.bathrooms}</td>
-                  <td>{u.dsq ? "Yes" : "No"}</td>
-                  <td>{u.floor_number}</td>
-                  <td>{u.amenities}</td>
-                  <td>{u.rent_amount_kes.toLocaleString()}</td>
-                  <td>{u.deposit_amount_kes.toLocaleString()}</td>
-                  <td>{u.space_sqm}</td>
+                  <td>Ksh {u.rent_amount_kes?.toLocaleString()}</td>
                   <td>{u.building_name}</td>
                   <td>
                     <button

@@ -13,12 +13,24 @@ export default function PropertyEntryPage() {
   const [showConfig, setShowConfig] = useState(false);
   const router = useRouter();
   const [currentbuildings, setCurrentBuildings] = useState([]);
+  const [owners, setOwners] = useState([]);
 
   useEffect(() => {
+    // Fetch buildings
     fetch("/api/property-records")
       .then((res) => res.json())
       .then((data) => {
         setCurrentBuildings(data.buildings || []);
+      });
+
+    // Fetch owners
+    fetch("/api/owners")
+      .then((res) => res.json())
+      .then((data) => {
+        setOwners(data || []);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch owners:", err);
       });
   }, []);
 
@@ -60,8 +72,14 @@ export default function PropertyEntryPage() {
         units: unitPayload,
       };
     } else {
+      // For unit-only entries, include owner_id if selected
+      const unitsWithOwner = unitPayload.map(unit => ({
+        ...unit,
+        owner_id: building.owner_id || null
+      }));
+
       payload = {
-        units: unitPayload,
+        units: unitsWithOwner,
       };
     }
 
@@ -134,6 +152,36 @@ export default function PropertyEntryPage() {
               </div>
             </div>
 
+            {/* Owner Selection - Always Visible */}
+            <div className="card card-secondary mt-3">
+              <div className="card-header">
+                <h3 className="card-title">Owner Assignment (Optional)</h3>
+              </div>
+              <div className="card-body">
+                <div className="form-group">
+                  <label>Select Owner (Optional)</label>
+                  <select
+                    name="owner_id"
+                    className="form-control"
+                    value={building.owner_id || ""}
+                    onChange={(e) =>
+                      setBuilding({
+                        ...building,
+                        owner_id: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">No Owner Assigned</option>
+                    {owners.map((owner) => (
+                      <option key={owner.id} value={owner.id}>
+                        {owner.full_name} - {owner.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
             {/* Building Info */}
             {entryType === "building" && (
               <BuildingForm form={building} setForm={setBuilding} />
@@ -169,6 +217,7 @@ export default function PropertyEntryPage() {
                 </div>
               </div>
             )}
+
 
             {entryType === "building" && parseInt(building.units_owned) > 1 && (
               <div className="mt-3 mb-3">

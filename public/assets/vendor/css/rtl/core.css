@@ -97,6 +97,12 @@ body {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(67, 89, 113, 0);
 }
+.ml-3 {
+  margin-left: 1rem;
+}
+.ml-2 {
+  margin-left: 0.5rem;
+}
 
 hr {
   margin: 1rem 0;
@@ -17568,7 +17574,6 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 
 .menu-toggle::after {
-  content: "";
   position: absolute;
   top: 50%;
   display: block;

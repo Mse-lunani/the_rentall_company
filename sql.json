@@ -1,0 +1,344 @@
+[{
+  "table_name": "admins",
+  "column_name": "id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": "nextval('admins_id_seq'::regclass)",
+  "is_nullable": "NO"
+}, {
+  "table_name": "admins",
+  "column_name": "email",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "admins",
+  "column_name": "password",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "admins",
+  "column_name": "created_at",
+  "data_type": "timestamp without time zone",
+  "character_maximum_length": null,
+  "column_default": "CURRENT_TIMESTAMP",
+  "is_nullable": "YES"
+}, {
+  "table_name": "buildings",
+  "column_name": "id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": "nextval('buildings_id_seq'::regclass)",
+  "is_nullable": "NO"
+}, {
+  "table_name": "buildings",
+  "column_name": "owner_id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "buildings",
+  "column_name": "name",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "buildings",
+  "column_name": "type",
+  "data_type": "character varying",
+  "character_maximum_length": 50,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "buildings",
+  "column_name": "units_owned",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "buildings",
+  "column_name": "total_space_sqm",
+  "data_type": "double precision",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "buildings",
+  "column_name": "occupancy_status",
+  "data_type": "character varying",
+  "character_maximum_length": 50,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "buildings",
+  "column_name": "created_at",
+  "data_type": "timestamp without time zone",
+  "character_maximum_length": null,
+  "column_default": "CURRENT_TIMESTAMP",
+  "is_nullable": "YES"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": "nextval('maintenance_logs_id_seq'::regclass)",
+  "is_nullable": "NO"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "unit_id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "description",
+  "data_type": "text",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "cost_kes",
+  "data_type": "numeric",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "notes",
+  "data_type": "text",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "image_url",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "maintenance_logs",
+  "column_name": "created_at",
+  "data_type": "timestamp without time zone",
+  "character_maximum_length": null,
+  "column_default": "CURRENT_TIMESTAMP",
+  "is_nullable": "YES"
+}, {
+  "table_name": "owners",
+  "column_name": "id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": "nextval('owners_id_seq'::regclass)",
+  "is_nullable": "NO"
+}, {
+  "table_name": "owners",
+  "column_name": "full_name",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "owners",
+  "column_name": "phone",
+  "data_type": "character varying",
+  "character_maximum_length": 50,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "owners",
+  "column_name": "email",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "owners",
+  "column_name": "national_id",
+  "data_type": "character varying",
+  "character_maximum_length": 100,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "owners",
+  "column_name": "address",
+  "data_type": "text",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "owners",
+  "column_name": "created_at",
+  "data_type": "timestamp without time zone",
+  "character_maximum_length": null,
+  "column_default": "CURRENT_TIMESTAMP",
+  "is_nullable": "YES"
+}, {
+  "table_name": "owners",
+  "column_name": "password",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "owners",
+  "column_name": "password_text",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "tenants",
+  "column_name": "id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": "nextval('tenants_id_seq'::regclass)",
+  "is_nullable": "NO"
+}, {
+  "table_name": "tenants",
+  "column_name": "full_name",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "tenants",
+  "column_name": "phone",
+  "data_type": "character varying",
+  "character_maximum_length": 50,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "tenants",
+  "column_name": "email",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "tenants",
+  "column_name": "unit_id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "tenants",
+  "column_name": "created_at",
+  "data_type": "timestamp without time zone",
+  "character_maximum_length": null,
+  "column_default": "CURRENT_TIMESTAMP",
+  "is_nullable": "YES"
+}, {
+  "table_name": "tenants",
+  "column_name": "password",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "tenants",
+  "column_name": "password_text",
+  "data_type": "character varying",
+  "character_maximum_length": 255,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "units",
+  "column_name": "id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": "nextval('units_id_seq'::regclass)",
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "building_id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "units",
+  "column_name": "name",
+  "data_type": "character varying",
+  "character_maximum_length": 100,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "bedrooms",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "bathrooms",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "space_sqm",
+  "data_type": "double precision",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "floor_number",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "amenities",
+  "data_type": "text",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}, {
+  "table_name": "units",
+  "column_name": "has_dsq",
+  "data_type": "boolean",
+  "character_maximum_length": null,
+  "column_default": "false",
+  "is_nullable": "YES"
+}, {
+  "table_name": "units",
+  "column_name": "rent_amount_kes",
+  "data_type": "numeric",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "deposit_amount_kes",
+  "data_type": "numeric",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "NO"
+}, {
+  "table_name": "units",
+  "column_name": "created_at",
+  "data_type": "timestamp without time zone",
+  "character_maximum_length": null,
+  "column_default": "CURRENT_TIMESTAMP",
+  "is_nullable": "YES"
+}, {
+  "table_name": "units",
+  "column_name": "owner_id",
+  "data_type": "integer",
+  "character_maximum_length": null,
+  "column_default": null,
+  "is_nullable": "YES"
+}]

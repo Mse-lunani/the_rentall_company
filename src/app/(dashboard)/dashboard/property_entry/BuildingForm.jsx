@@ -1,4 +1,5 @@
 export default function BuildingForm({ form, setForm }) {
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });

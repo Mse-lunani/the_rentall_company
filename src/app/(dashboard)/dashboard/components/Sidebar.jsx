@@ -6,7 +6,9 @@ import React, { useState } from "react";
 export default function Sidebar() {
   const pathname = usePathname();
   const [isBuildingsOpen, setBuildingsOpen] = useState(false);
+  const [isUnitsOpen, setUnitsOpen] = useState(false);
   const [isTenantsOpen, setTenantsOpen] = useState(false);
+  const [isOwnersOpen, setOwnersOpen] = useState(false);
   const [isPaymentsOpen, setPaymentsOpen] = useState(false);
   const [isMaintenanceOpen, setMaintenanceOpen] = useState(false);
 
@@ -72,6 +74,38 @@ export default function Sidebar() {
           </ul>
         </li>
 
+        {/* Units */}
+        <li className="menu-item menu-toggle">
+          <a
+            href="javascript:void(0);"
+            className="menu-link"
+            onClick={() => setUnitsOpen(!isUnitsOpen)}
+          >
+            <i className="menu-icon tf-icons bx bx-door-open" />
+            <div data-i18n="Units">Units</div>
+          </a>
+          <ul className={`menu-sub ${isUnitsOpen ? "d-block" : "d-none"}`}>
+            <li
+              className={`menu-item ${
+                pathname === "/dashboard/units" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/units" className="menu-link">
+                <div data-i18n="All Units">All Units</div>
+              </Link>
+            </li>
+            <li
+              className={`menu-item ${
+                pathname === "/dashboard/units/standalone" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/units/standalone" className="menu-link">
+                <div data-i18n="Standalone Units">Standalone Units</div>
+              </Link>
+            </li>
+          </ul>
+        </li>
+
         {/*  Tenants */}
         <li className="menu-item menu-toggle">
           <a
@@ -99,6 +133,38 @@ export default function Sidebar() {
             >
               <Link href="/dashboard/tenants" className="menu-link">
                 <div data-i18n="View Tenants">View Tenants</div>
+              </Link>
+            </li>
+          </ul>
+        </li>
+
+        {/*  Owners */}
+        <li className="menu-item menu-toggle">
+          <a
+            href="javascript:void(0);"
+            className="menu-link"
+            onClick={() => setOwnersOpen(!isOwnersOpen)}
+          >
+            <i className="menu-icon tf-icons bx bx-crown" />
+            <div data-i18n="Owners">Owners</div>
+          </a>
+          <ul className={`menu-sub ${isOwnersOpen ? "d-block" : "d-none"}`}>
+            <li
+              className={`menu-item ${
+                pathname === "/dashboard/owners/add" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/owners/add" className="menu-link">
+                <div data-i18n="Add Owner">Add Owner</div>
+              </Link>
+            </li>
+            <li
+              className={`menu-item ${
+                pathname === "/dashboard/owners" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/owners" className="menu-link">
+                <div data-i18n="View Owners">View Owners</div>
               </Link>
             </li>
           </ul>

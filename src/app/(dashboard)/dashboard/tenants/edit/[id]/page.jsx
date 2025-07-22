@@ -17,11 +17,12 @@ export default function EditTenantPage({ params }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchTenants(params.id);
+      const resolvedParams = await params;
+      const data = await fetchTenants(resolvedParams.id);
       setTenant(data);
     };
     fetchData();
-  }, []);
+  }, [params]);
 
   return (
     <div className="content-wrapper">

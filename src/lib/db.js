@@ -36,7 +36,10 @@ export async function insertRow(table, data, returnCol = null) {
   return returnCol ? result[0] : true;
 }
 export async function getRows(table) {
-  const result = (await sql`SELECT * FROM`) + table;
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(table)) {
+    throw new Error("Invalid table name");
+  }
+  const result = await sql.query(`SELECT * FROM "${table}"`);
   return result;
 }
 export async function query(sqlStatement, params = []) {

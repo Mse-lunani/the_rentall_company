@@ -13,14 +13,18 @@ export default function SingleBuildingPage({ params }) {
     const fetchData = async () => {
       const resolvedParams = await params;
       const buildingId = resolvedParams.id;
-      
+
       try {
         // Fetch building data and its units
-        const res = await fetch(`/api/property-records?unit_type=building&building_id=${buildingId}&include_occupied=true`);
+        const res = await fetch(
+          `/api/property-records?unit_type=building&building_id=${buildingId}&include_occupied=true`
+        );
         const data = await res.json();
-        
+
         // Find the specific building
-        const buildingData = data.buildings.find(b => b.id.toString() === buildingId.toString());
+        const buildingData = data.buildings.find(
+          (b) => b.id.toString() === buildingId.toString()
+        );
         setBuilding(buildingData);
         setUnits(data.units || []);
         setLoading(false);
@@ -45,7 +49,9 @@ export default function SingleBuildingPage({ params }) {
   }, [loading, units]);
 
   const handleDeleteUnit = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this unit?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this unit?"
+    );
     if (!confirm) return;
 
     try {
@@ -87,7 +93,10 @@ export default function SingleBuildingPage({ params }) {
         <section className="content-header">
           <div className="container-xxl flex-grow-1 container-p-y">
             <p>Building not found</p>
-            <Link href="/dashboard/property_records" className="btn btn-secondary">
+            <Link
+              href="/dashboard/property_records"
+              className="btn btn-secondary"
+            >
               Back to Buildings
             </Link>
           </div>
@@ -100,17 +109,20 @@ export default function SingleBuildingPage({ params }) {
     <div className="content-wrapper">
       <section className="content-header">
         <div className="container-xxl flex-grow-1 container-p-y">
-          
           {/* Header with Building Info */}
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
               <h1>Building: {building.name}</h1>
               <p className="text-muted mb-0">
-                {building.type} • {building.units_owned} units • {building.total_space_sqm} sqm
+                {building.type} • {building.units_owned} units •{" "}
+                {building.total_space_sqm} sqm
                 {building.owner_name && (
                   <>
                     {" • Owner: "}
-                    <Link href={`/dashboard/owners/${building.owner_id}`} className="text-primary">
+                    <Link
+                      href={`/dashboard/owners/${building.owner_id}`}
+                      className="text-primary"
+                    >
                       {building.owner_name}
                     </Link>
                   </>
@@ -118,10 +130,16 @@ export default function SingleBuildingPage({ params }) {
               </p>
             </div>
             <div>
-              <Link href="/dashboard/property_records" className="btn btn-secondary me-2">
+              <Link
+                href="/dashboard/property_records"
+                className="btn btn-secondary me-2"
+              >
                 Back to Buildings
               </Link>
-              <Link href={`/dashboard/property_entry/units/add?building_id=${building.id}`} className="btn btn-primary">
+              <Link
+                href={`/dashboard/property_entry/`}
+                className="btn btn-primary"
+              >
                 Add Unit
               </Link>
             </div>
@@ -135,21 +153,38 @@ export default function SingleBuildingPage({ params }) {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-6">
-                  <p><strong>Name:</strong> {building.name}</p>
-                  <p><strong>Type:</strong> {building.type}</p>
-                  <p><strong>Total Units:</strong> {building.units_owned}</p>
+                  <p>
+                    <strong>Name:</strong> {building.name}
+                  </p>
+                  <p>
+                    <strong>Type:</strong> {building.type}
+                  </p>
+                  <p>
+                    <strong>Total Units:</strong> {building.units_owned}
+                  </p>
                 </div>
                 <div className="col-md-6">
-                  <p><strong>Total Space:</strong> {building.total_space_sqm} sqm</p>
-                  <p><strong>Occupancy Status:</strong> 
-                    <span className={`badge ms-2 badge-${
-                      building.occupancy_status === 'Fully Occupied' ? 'success' :
-                      building.occupancy_status === 'Partially Occupied' ? 'warning' : 'danger'
-                    }`}>
+                  <p>
+                    <strong>Total Space:</strong> {building.total_space_sqm} sqm
+                  </p>
+                  <p>
+                    <strong>Occupancy Status:</strong>
+                    <span
+                      className={`badge ms-2 badge-${
+                        building.occupancy_status === "Fully Occupied"
+                          ? "success"
+                          : building.occupancy_status === "Partially Occupied"
+                          ? "warning"
+                          : "danger"
+                      }`}
+                    >
                       {building.occupancy_status}
                     </span>
                   </p>
-                  <p><strong>Created:</strong> {new Date(building.created_at).toLocaleDateString()}</p>
+                  <p>
+                    <strong>Created:</strong>{" "}
+                    {new Date(building.created_at).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
             </div>
@@ -158,7 +193,10 @@ export default function SingleBuildingPage({ params }) {
           {/* Units Table */}
           <div className="card">
             <div className="card-body table-responsive">
-              <table className="table table-bordered table-striped datatables-basic" data-name={`Units in ${building.name}`}>
+              <table
+                className="table table-bordered table-striped datatables-basic"
+                data-name={`Units in ${building.name}`}
+              >
                 <thead>
                   <tr>
                     <th>#</th>
@@ -179,7 +217,10 @@ export default function SingleBuildingPage({ params }) {
                       <td>{unit.name}</td>
                       <td>
                         {unit.owner_name ? (
-                          <Link href={`/dashboard/owners/${unit.owner_id}`} className="text-primary">
+                          <Link
+                            href={`/dashboard/owners/${unit.owner_id}`}
+                            className="text-primary"
+                          >
                             {unit.owner_name}
                           </Link>
                         ) : (
@@ -188,15 +229,24 @@ export default function SingleBuildingPage({ params }) {
                       </td>
                       <td>{unit.bedrooms || "N/A"}</td>
                       <td>{unit.bathrooms || "N/A"}</td>
-                      <td>Ksh {unit.rent_amount_kes?.toLocaleString() || "N/A"}</td>
                       <td>
-                        <span className={`badge badge-${unit.is_occupied ? 'danger' : 'success'}`}>
-                          {unit.is_occupied ? 'Occupied' : 'Available'}
+                        Ksh {unit.rent_amount_kes?.toLocaleString() || "N/A"}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-${
+                            unit.is_occupied ? "danger" : "success"
+                          }`}
+                        >
+                          {unit.is_occupied ? "Occupied" : "Available"}
                         </span>
                       </td>
                       <td>
                         {unit.tenant_name ? (
-                          <Link href={`/dashboard/tenants/${unit.tenant_id}`} className="text-primary">
+                          <Link
+                            href={`/dashboard/tenants/${unit.tenant_id}`}
+                            className="text-primary"
+                          >
                             {unit.tenant_name}
                           </Link>
                         ) : (
@@ -224,15 +274,19 @@ export default function SingleBuildingPage({ params }) {
               </table>
               {units.length === 0 && (
                 <div className="text-center py-4">
-                  <p className="text-muted mb-3">No units found in this building.</p>
-                  <Link href={`/dashboard/property_entry/units/add?building_id=${building.id}`} className="btn btn-primary">
+                  <p className="text-muted mb-3">
+                    No units found in this building.
+                  </p>
+                  <Link
+                    href={`/dashboard/property_entry/units/add?building_id=${building.id}`}
+                    className="btn btn-primary"
+                  >
                     Add First Unit
                   </Link>
                 </div>
               )}
             </div>
           </div>
-
         </div>
       </section>
     </div>

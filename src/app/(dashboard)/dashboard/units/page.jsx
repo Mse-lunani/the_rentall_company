@@ -64,24 +64,29 @@ export default function AllUnitsPage() {
         <div className="container-xxl flex-grow-1 container-p-y">
           
           {/* Header */}
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+            <div className="mb-3 mb-md-0">
               <h1>All Units</h1>
               <p className="text-muted mb-0">Complete list of all units in the system</p>
             </div>
-            <div>
-              <Link href="/dashboard/units/standalone" className="btn btn-outline-primary me-2">
-                Standalone Units
+            <div className="d-flex flex-column flex-sm-row gap-2">
+              <Link href="/dashboard/units/standalone" className="btn btn-outline-primary">
+                <i className="bx bx-building-house me-1"></i>
+                <span className="d-none d-sm-inline">Standalone Units</span>
+                <span className="d-inline d-sm-none">Standalone</span>
               </Link>
               <Link href="/dashboard/property_entry" className="btn btn-primary">
-                Add New Unit
+                <i className="bx bx-plus me-1"></i>
+                <span className="d-none d-sm-inline">Add New Unit</span>
+                <span className="d-inline d-sm-none">Add Unit</span>
               </Link>
             </div>
           </div>
 
           {/* Units Table */}
           <div className="card">
-            <div className="card-body table-responsive">
+            <div className="card-body">
+              <div className="table-responsive">
               {loading ? (
                 <div className="text-center py-4">
                   <p>Loading units...</p>
@@ -90,7 +95,7 @@ export default function AllUnitsPage() {
                 <table className="table table-bordered table-striped datatables-basic" data-name="All Units">
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th style={{width: '15px'}}></th>
                       <th>Unit Name</th>
                       <th>Building</th>
                       <th>Owner</th>
@@ -105,8 +110,8 @@ export default function AllUnitsPage() {
                   <tbody>
                     {units.map((unit, index) => (
                       <tr key={unit.id}>
-                        <td>{index + 1}</td>
-                        <td>{unit.name}</td>
+                        <td></td>
+                        <td><strong>{unit.name}</strong></td>
                         <td>
                           {unit.building_name === 'Standalone' ? (
                             <span className="badge badge-secondary">Standalone</span>
@@ -130,7 +135,7 @@ export default function AllUnitsPage() {
                         </td>
                         <td>{unit.bedrooms || "N/A"}</td>
                         <td>{unit.bathrooms || "N/A"}</td>
-                        <td>Ksh {unit.rent_amount_kes?.toLocaleString() || "N/A"}</td>
+                        <td><strong>Ksh {unit.rent_amount_kes?.toLocaleString() || "N/A"}</strong></td>
                         <td>
                           <span className={`badge badge-${unit.is_occupied ? 'danger' : 'success'}`}>
                             {unit.is_occupied ? 'Occupied' : 'Available'}
@@ -146,19 +151,23 @@ export default function AllUnitsPage() {
                           )}
                         </td>
                         <td>
-                          <Link
-                            href={`/dashboard/property_records/units/edit/${unit.id}`}
-                            className="btn btn-warning btn-sm me-1"
-                          >
-                            Edit
-                          </Link>
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleDeleteUnit(unit.id)}
-                            disabled={loading}
-                          >
-                            Delete
-                          </button>
+                          <div className="btn-group" role="group">
+                            <Link
+                              href={`/dashboard/property_records/units/edit/${unit.id}`}
+                              className="btn btn-warning btn-sm"
+                              title="Edit Unit"
+                            >
+                              <i className="bx bx-edit"></i>
+                            </Link>
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => handleDeleteUnit(unit.id)}
+                              disabled={loading}
+                              title="Delete Unit"
+                            >
+                              <i className="bx bx-trash"></i>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -173,6 +182,7 @@ export default function AllUnitsPage() {
                   </Link>
                 </div>
               )}
+              </div>
             </div>
           </div>
 

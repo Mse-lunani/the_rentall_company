@@ -4,8 +4,18 @@ import Link from "next/link";
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState([]);
-
   const [loading, setLoading] = useState(true);
+
+  // Initialize DataTable after payments load
+  useEffect(() => {
+    if (!loading && payments.length > 0) {
+      setTimeout(() => {
+        if (window.initDataTable) {
+          window.initDataTable();
+        }
+      }, 100);
+    }
+  }, [loading, payments]);
   const fetchPayments = async () => {
     try {
       setLoading(true);
@@ -34,51 +44,59 @@ export default function PaymentsPage() {
             </Link>
           </div>
 
-          <div className="card card-body shadow-sm">
-            <table className="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Tenant</th>
-                  <th>Amount (Ksh)</th>
-                  <th>Date</th>
-                  <th>Notes</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((p, index) => (
-                  <tr key={p.id}>
-                    <td>{index + 1}</td>
-                    <td>{p.full_name}</td>
-                    <td>{p.amount_paid.toLocaleString()}</td>
-                    <td>{p.date_paid}</td>
-                    <td>{p.notes}</td>
-                    <td>
-                      <Link
-                        href={`/dashboard/payments/edit/${p.id}`}
-                        className="btn btn-sm btn-success me-2"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDelete(tenant.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {payments.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="text-center text-muted">
-                      No payments recorded yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="card">
+            <div className="card-body">
+              <div className="table-responsive">
+                <table className="table table-bordered table-striped datatables-basic" data-name="Payment Records">
+                  <thead>
+                    <tr>
+                      <th style={{width: '15px'}}></th>
+                      <th>Tenant</th>
+                      <th>Amount (Ksh)</th>
+                      <th>Date</th>
+                      <th>Notes</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.map((p, index) => (
+                      <tr key={p.id}>
+                        <td></td>
+                        <td><strong>{p.full_name}</strong></td>
+                        <td><strong>Ksh {p.amount_paid?.toLocaleString()}</strong></td>
+                        <td>{p.date_paid}</td>
+                        <td>{p.notes}</td>
+                        <td>
+                          <div className="btn-group" role="group">
+                            <Link
+                              href={`/dashboard/payments/edit/${p.id}`}
+                              className="btn btn-warning btn-sm"
+                              title="Edit Payment"
+                            >
+                              <i className="bx bx-edit"></i>
+                            </Link>
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => handleDelete(p.id)}
+                              title="Delete Payment"
+                            >
+                              <i className="bx bx-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {payments.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="text-center text-muted">
+                          No payments recorded yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </section>

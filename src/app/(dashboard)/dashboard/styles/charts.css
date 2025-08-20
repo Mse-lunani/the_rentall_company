@@ -1,0 +1,147 @@
+/* Modern Chart Styling */
+.modern-chart-card {
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.8);
+  border: none;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.modern-chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 10px 25px -3px rgba(0, 0, 0, 0.1),
+    0 20px 40px -6px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.modern-chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    #667eea 0%, 
+    #764ba2 25%, 
+    #f093fb 50%, 
+    #f5576c 75%, 
+    #4facfe 100%);
+  opacity: 0.8;
+}
+
+.modern-chart-header {
+  padding: 1.5rem 2rem 1rem;
+  background: transparent;
+  border: none;
+  position: relative;
+}
+
+.modern-chart-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.025em;
+  position: relative;
+}
+
+.modern-chart-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 1px;
+}
+
+.modern-chart-body {
+  padding: 0 2rem 2rem;
+  position: relative;
+}
+
+/* Chart Container Enhancements */
+.modern-chart-body canvas {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-chart-card {
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .modern-chart-header {
+    padding: 1.25rem 1.5rem 0.75rem;
+  }
+  
+  .modern-chart-body {
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  .modern-chart-title {
+    font-size: 1rem;
+  }
+}
+
+/* Animation for chart loading */
+.modern-chart-body {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glassmorphism effect for dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  .modern-chart-card {
+    background: linear-gradient(135deg, 
+      rgba(15, 23, 42, 0.9) 0%, 
+      rgba(30, 41, 59, 0.8) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .modern-chart-title {
+    color: #f1f5f9;
+  }
+  
+  .modern-chart-body canvas {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Custom scrollbar for mobile */
+.modern-chart-body::-webkit-scrollbar {
+  height: 4px;
+}
+
+.modern-chart-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.modern-chart-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 2px;
+}

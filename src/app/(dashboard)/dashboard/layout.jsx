@@ -1,12 +1,46 @@
 // src/app/dashboard/layout.jsx
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Script from "next/script";
 import Link from "next/link";
 
+function closeSidebar() {
+  const layoutContainer = document.querySelector('.layout-container');
+  if (layoutContainer && layoutContainer.classList.contains('layout-menu-expanded')) {
+    console.log('Closing sidebar');
+    layoutContainer.classList.remove('layout-menu-expanded');
+  }
+}
+
+
 export default function DashboardLayout({ children }) {
+  useEffect(() => {
+    function handleBodyClick(event) {
+      const layoutContainer = document.querySelector('.layout-container');
+      const sidebar = document.querySelector('.layout-menu');
+      const hamburger = document.querySelector('.layout-menu-toggle');
+      
+      // Close sidebar if open and click is outside sidebar and hamburger
+      if (layoutContainer?.classList.contains('layout-menu-expanded')) {
+        if (!sidebar?.contains(event.target) && !hamburger?.contains(event.target)) {
+          console.log('Body clicked outside sidebar');
+          closeSidebar();
+        }
+      }
+    }
+    
+    // Add event listener
+    document.body.addEventListener('click', handleBodyClick);
+    
+    // Cleanup
+    return () => {
+      document.body.removeEventListener('click', handleBodyClick);
+    };
+  }, []);
+
   return (
     <html
       lang="en"
@@ -123,15 +157,13 @@ export default function DashboardLayout({ children }) {
               <Footer />
             </div>
           </div>
+          
+          {/* Keep overlay for visual effect */}
+          <div className="layout-overlay"></div>
         </div>
         {/* ── CLOSE: wrapper DIVs ───────────────────────────────────────── */}
 
-        {/*
-          These next two <div>s were coming at the very end of your PHP
-          (overlay + drag-target). We leave them here, still as siblings of
-          the wrapper <div>.
-        */}
-        <div className="layout-overlay layout-menu-toggle"></div>
+        {/* Drag target outside */}
         <div className="drag-target"></div>
       </body>
     </html>

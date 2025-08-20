@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import UnitForm from "../../../../property_entry/UnitForm";
 
 export default function EditUnitPage({ params }) {
-  const { id } = params;
+  const { id } = use(params);
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -18,19 +18,28 @@ export default function EditUnitPage({ params }) {
     amenities: "",
     has_dsq: false,
     space_sqm: "",
+    owner_id: "",
   });
 
   const [loading, setLoading] = useState(true);
+  const [owners, setOwners] = useState([]);
 
   useEffect(() => {
-    async function fetchUnit() {
+    async function fetchData() {
       try {
-        const res = await fetch(`/api/units?id=${id}`);
-        if (!res.ok) throw new Error("Failed to fetch unit");
+        // Fetch unit data
+        const unitRes = await fetch(`/api/units?id=${id}`);
+        if (!unitRes.ok) throw new Error("Failed to fetch unit");
+        const unitData = await unitRes.json();
+        console.log("Fetched unit data:", unitData);
+        setForm(unitData);
 
-        const data = await res.json();
-        console.log("Fetched unit data:", data);
-        setForm(data);
+        // Fetch owners
+        const ownersRes = await fetch("/api/owners");
+        if (ownersRes.ok) {
+          const ownersData = await ownersRes.json();
+          setOwners(ownersData || []);
+        }
       } catch (err) {
         console.error("Fetch error:", err);
       } finally {
@@ -38,7 +47,7 @@ export default function EditUnitPage({ params }) {
       }
     }
 
-    fetchUnit();
+    fetchData();
   }, [id]);
 
   const handleChange = (updatedForm) => {
@@ -49,11 +58,17 @@ export default function EditUnitPage({ params }) {
     e.preventDefault();
     console.log("Updating unit...", form);
 
+    // Prepare form data, converting empty owner_id to null
+    const formData = {
+      ...form,
+      owner_id: form.owner_id === "" ? null : parseInt(form.owner_id) || null,
+    };
+
     try {
       const res = await fetch(`/api/units?id=${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(formData),
       });
 
       if (!res.ok) {
@@ -63,6 +78,7 @@ export default function EditUnitPage({ params }) {
         return;
       }
 
+      alert("Unit updated successfully!");
       router.push("/dashboard/property_records");
     } catch (err) {
       console.error("Network or server error:", err);
@@ -78,6 +94,36 @@ export default function EditUnitPage({ params }) {
         <div className="container-xxl flex-grow-1 container-p-y">
           <h3>Edit Unit {form.name}</h3>
           <form onSubmit={handleSubmit}>
+            {/* Owner Assignment Section */}
+            <div className="card card-secondary mt-3 mb-3">
+              <div className="card-header">
+                <h3 className="card-title">Owner Assignment (Optional)</h3>
+              </div>
+              <div className="card-body">
+                <div className="form-group">
+                  <label>Select Owner (Optional)</label>
+                  <select
+                    name="owner_id"
+                    className="form-control"
+                    value={form.owner_id || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        owner_id: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">No Owner Assigned</option>
+                    {owners.map((owner) => (
+                      <option key={owner.id} value={owner.id}>
+                        {owner.full_name} - {owner.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <UnitForm
               index={0}
               data={form}

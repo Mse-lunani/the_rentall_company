@@ -1,16 +1,53 @@
 // src/app/dashboard/components/Navbar.jsx
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+
+function toggleSidebar() {
+  console.log('Hamburger clicked!'); // Debug log
+  const layoutContainer = document.querySelector('.layout-container');
+  
+  if (layoutContainer) {
+    layoutContainer.classList.toggle('layout-menu-expanded');
+    console.log('Current classes:', layoutContainer.className); // Debug log
+  }
+}
 
 export default function Navbar() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = document.querySelector('.dropdown-shortcuts');
+      
+      if (isDropdownOpen && dropdown && !dropdown.contains(event.target)) {
+        console.log('Clicked outside dropdown, closing');
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   return (
     <nav
       className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
       id="layout-navbar"
     >
       <div className="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-        <a className="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+        <button className="nav-item nav-link px-0 me-xl-4 btn btn-link" onClick={toggleSidebar} style={{border: 'none', background: 'none'}}>
           <i className="bx bx-menu bx-sm" />
-        </a>
+        </button>
       </div>
 
       <div
@@ -20,15 +57,15 @@ export default function Navbar() {
         {/* Search */}
         <div className="navbar-nav align-items-center">
           <div className="nav-item navbar-search-wrapper mb-0">
-            <a
-              className="nav-item nav-link search-toggler px-0"
-              href="javascript:void(0);"
+            <button
+              className="nav-item nav-link search-toggler px-0 btn btn-link"
+              style={{border: 'none', background: 'none'}}
             >
               <i className="bx bx-search bx-sm" />
               <span className="d-none d-md-inline-block text-muted">
                 Search (Ctrl+/)
               </span>
-            </a>
+            </button>
           </div>
         </div>
         {/* /Search */}
@@ -36,60 +73,60 @@ export default function Navbar() {
         <ul className="navbar-nav flex-row align-items-center ms-auto">
           {/* Style Switcher */}
           <li className="nav-item me-2 me-xl-0">
-            <a
-              className="nav-link style-switcher-toggle hide-arrow"
-              href="javascript:void(0);"
+            <button
+              className="nav-link style-switcher-toggle hide-arrow btn btn-link"
+              style={{border: 'none', background: 'none'}}
+              onClick={() => {/* Add style switcher logic if needed */}}
             >
               <i className="bx bx-sm" />
-            </a>
+            </button>
           </li>
           {/*/ Style Switcher */}
 
           {/* Quick links */}
           <li className="nav-item dropdown-shortcuts navbar-dropdown dropdown me-2 me-xl-0">
-            <a
-              className="nav-link dropdown-toggle hide-arrow"
-              href="javascript:void(0);"
-              data-bs-toggle="dropdown"
-              data-bs-auto-close="outside"
-              aria-expanded="false"
+            <button
+              className="nav-link dropdown-toggle hide-arrow btn btn-link"
+              style={{border: 'none', background: 'none'}}
+              onClick={toggleDropdown}
+              aria-expanded={isDropdownOpen}
             >
               <i className="bx bx-grid-alt bx-sm" />
-            </a>
-            <div className="dropdown-menu dropdown-menu-end py-0">
+            </button>
+            <div className={`dropdown-menu py-0 ${isDropdownOpen ? 'show' : ''}`} style={{right: '0', left: 'auto'}}>
               <div className="dropdown-menu-header border-bottom">
                 <div className="dropdown-header d-flex align-items-center py-3">
                   <h5 className="text-body mb-0 me-auto">Shortcuts</h5>
-                  <a
-                    href="javascript:void(0)"
-                    className="dropdown-shortcuts-add text-body"
+                  <button
+                    className="dropdown-shortcuts-add text-body btn btn-link p-0"
+                    style={{border: 'none', background: 'none'}}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     title="Add shortcuts"
                   >
                     <i className="bx bx-sm bx-plus-circle" />
-                  </a>
+                  </button>
                 </div>
               </div>
               <div className="dropdown-shortcuts-list scrollable-container">
                 <div className="row row-bordered overflow-visible g-0">
                   <div className="dropdown-shortcuts-item col">
                     <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-calendar fs-4" />
+                      <i className="bx bx-folder fs-4" />
                     </span>
-                    <a href="/dashboard/calendar" className="stretched-link">
-                      Calendar
+                    <a href="/dashboard/property_records" className="stretched-link">
+                      View Buildings
                     </a>
-                    <small className="text-muted mb-0">Appointments</small>
+                    <small className="text-muted mb-0">All Properties</small>
                   </div>
                   <div className="dropdown-shortcuts-item col">
                     <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-food-menu fs-4" />
+                      <i className="bx bx-door-open fs-4" />
                     </span>
-                    <a href="/dashboard/invoices" className="stretched-link">
-                      Invoice App
+                    <a href="/dashboard/units" className="stretched-link">
+                      All Units
                     </a>
-                    <small className="text-muted mb-0">Manage Accounts</small>
+                    <small className="text-muted mb-0">View Units</small>
                   </div>
                 </div>
                 <div className="row row-bordered overflow-visible g-0">
@@ -97,59 +134,39 @@ export default function Navbar() {
                     <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
                       <i className="bx bx-user fs-4" />
                     </span>
-                    <a href="/dashboard/users" className="stretched-link">
-                      User App
+                    <a href="/dashboard/tenants" className="stretched-link">
+                      View Tenants
                     </a>
-                    <small className="text-muted mb-0">Manage Users</small>
+                    <small className="text-muted mb-0">Tenant List</small>
                   </div>
                   <div className="dropdown-shortcuts-item col">
                     <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-check-shield fs-4" />
+                      <i className="bx bx-crown fs-4" />
                     </span>
-                    <a href="/dashboard/roles" className="stretched-link">
-                      Role Management
+                    <a href="/dashboard/owners" className="stretched-link">
+                      View Owners
                     </a>
-                    <small className="text-muted mb-0">Permission</small>
-                  </div>
-                </div>
-                <div className="row row-bordered overflow-visible g-0">
-                  <div className="dropdown-shortcuts-item col">
-                    <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-pie-chart-alt-2 fs-4" />
-                    </span>
-                    <a href="/dashboard" className="stretched-link">
-                      Dashboard
-                    </a>
-                    <small className="text-muted mb-0">User Profile</small>
-                  </div>
-                  <div className="dropdown-shortcuts-item col">
-                    <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-cog fs-4" />
-                    </span>
-                    <a href="/dashboard/settings" className="stretched-link">
-                      Settings
-                    </a>
-                    <small className="text-muted mb-0">Account Settings</small>
+                    <small className="text-muted mb-0">Owner List</small>
                   </div>
                 </div>
                 <div className="row row-bordered overflow-visible g-0">
                   <div className="dropdown-shortcuts-item col">
                     <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-help-circle fs-4" />
+                      <i className="bx bx-money fs-4" />
                     </span>
-                    <a href="/dashboard/help" className="stretched-link">
-                      Help Center
+                    <a href="/dashboard/payments" className="stretched-link">
+                      View Payments
                     </a>
-                    <small className="text-muted mb-0">FAQs & Articles</small>
+                    <small className="text-muted mb-0">Payment Records</small>
                   </div>
                   <div className="dropdown-shortcuts-item col">
                     <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
-                      <i className="bx bx-window-open fs-4" />
+                      <i className="bx bx-wrench fs-4" />
                     </span>
-                    <a href="/dashboard/modals" className="stretched-link">
-                      Modals
+                    <a href="/dashboard/maintenance" className="stretched-link">
+                      Maintenance
                     </a>
-                    <small className="text-muted mb-0">Useful Popups</small>
+                    <small className="text-muted mb-0">Work Orders</small>
                   </div>
                 </div>
               </div>

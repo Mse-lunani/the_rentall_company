@@ -65,7 +65,7 @@ export default function BuildingTable() {
           <table className="table table-bordered table-striped datatables-basic" data-name="Building Records">
             <thead>
               <tr>
-                <th>#</th>
+                <th style={{width: '15px'}}></th>
                 <th>Name</th>
                 <th>Type</th>
                 <th>Owner</th>
@@ -78,7 +78,7 @@ export default function BuildingTable() {
             <tbody>
               {Buildings.map((b, i) => (
                 <tr key={b.id}>
-                  <td>{i + 1}</td>
+                  <td></td>
                   <td>{b.name}</td>
                   <td>{b.type}</td>
                   <td>
@@ -97,31 +97,37 @@ export default function BuildingTable() {
                   <td>{b.total_space_sqm}</td>
                   <td>{b.occupancy_status}</td>
                   <td>
-                    <Link
-                      href={`/dashboard/property_records/buildings/${b.id}`}
-                      className="btn btn-primary btn-sm me-1"
-                    >
-                      View Units
-                    </Link>
-                    <button
-                      className="btn btn-info btn-sm me-1"
-                      onClick={() => setSelected(b)}
-                    >
-                      Details
-                    </button>
-                    <Link
-                      href={`/dashboard/property_records/buildings/edit/${b.id}`}
-                      className="btn btn-warning btn-sm me-1"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDelete(b.id)}
-                      disabled={loading}
-                    >
-                      Delete
-                    </button>
+                    <div className="btn-group" role="group">
+                      <Link
+                        href={`/dashboard/property_records/buildings/${b.id}`}
+                        className="btn btn-primary btn-sm"
+                        title="View Units"
+                      >
+                        <i className="bx bx-building-house"></i>
+                      </Link>
+                      <button
+                        className="btn btn-info btn-sm"
+                        onClick={() => setSelected(b)}
+                        title="View Details"
+                      >
+                        <i className="bx bx-show"></i>
+                      </button>
+                      <Link
+                        href={`/dashboard/property_records/buildings/edit/${b.id}`}
+                        className="btn btn-warning btn-sm"
+                        title="Edit Building"
+                      >
+                        <i className="bx bx-edit"></i>
+                      </Link>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(b.id)}
+                        disabled={loading}
+                        title="Delete Building"
+                      >
+                        <i className="bx bx-trash"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

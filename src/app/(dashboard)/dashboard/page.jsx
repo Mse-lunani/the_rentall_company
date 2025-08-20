@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import { Bar, Line } from "react-chartjs-2";
+import "./styles/charts.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -68,10 +69,20 @@ export default function DashboardPage() {
       {
         label: "Monthly Payments",
         data: kpis.monthlyPayments.map((item) => item.total),
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.1,
+        borderColor: "rgba(102, 126, 234, 1)",
+        backgroundColor: "linear-gradient(180deg, rgba(102, 126, 234, 0.3) 0%, rgba(102, 126, 234, 0.05) 100%)",
+        borderWidth: 3,
+        pointBackgroundColor: "#667eea",
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 3,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointHoverBackgroundColor: "#667eea",
+        pointHoverBorderColor: "#ffffff",
+        pointHoverBorderWidth: 4,
+        tension: 0.4,
         fill: true,
+        gradient: true,
       },
     ],
   };
@@ -83,12 +94,26 @@ export default function DashboardPage() {
       {
         label: "Occupied Units",
         data: kpis.occupancyData.map((item) => item.occupied),
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
+        backgroundColor: "rgba(16, 185, 129, 0.8)",
+        borderColor: "rgba(16, 185, 129, 1)",
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+        hoverBackgroundColor: "rgba(16, 185, 129, 0.9)",
+        hoverBorderColor: "rgba(16, 185, 129, 1)",
+        hoverBorderWidth: 3,
       },
       {
         label: "Vacant Units",
         data: kpis.occupancyData.map((item) => item.vacant),
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: "rgba(239, 68, 68, 0.8)",
+        borderColor: "rgba(239, 68, 68, 1)",
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+        hoverBackgroundColor: "rgba(239, 68, 68, 0.9)",
+        hoverBorderColor: "rgba(239, 68, 68, 1)",
+        hoverBorderWidth: 3,
       },
     ],
   };
@@ -157,15 +182,28 @@ export default function DashboardPage() {
           <div className="row">
             <div className="col-lg-6 mb-4">
               <ChartCard title="Monthly Payments Trend">
-                <Line
+                <div style={{ height: '400px' }}>
+                  <Line
                   data={monthlyPaymentsData}
                   options={{
                     responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                      mode: 'index',
+                      intersect: false,
+                    },
                     plugins: {
                       legend: {
-                        position: "top",
+                        display: false,
                       },
                       tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 2,
+                        cornerRadius: 8,
+                        displayColors: false,
                         callbacks: {
                           label: function (context) {
                             return `Ksh ${context.raw.toLocaleString()}`;
@@ -174,8 +212,29 @@ export default function DashboardPage() {
                       },
                     },
                     scales: {
-                      y: {
+                      x: {
+                        grid: {
+                          display: false,
+                        },
                         ticks: {
+                          color: '#64748b',
+                          font: {
+                            size: 12,
+                            weight: '500',
+                          },
+                        },
+                      },
+                      y: {
+                        grid: {
+                          color: 'rgba(148, 163, 184, 0.1)',
+                          lineWidth: 1,
+                        },
+                        ticks: {
+                          color: '#64748b',
+                          font: {
+                            size: 12,
+                            weight: '500',
+                          },
                           callback: function (value) {
                             return `Ksh ${value.toLocaleString()}`;
                           },
@@ -183,31 +242,77 @@ export default function DashboardPage() {
                       },
                     },
                   }}
-                />
+                  />
+                </div>
               </ChartCard>
             </div>
 
             <div className="col-lg-6 mb-4">
               <ChartCard title="Unit Occupancy by Building">
-                <Bar
+                <div style={{ height: '400px' }}>
+                  <Bar
                   data={occupancyData}
                   options={{
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                       legend: {
                         position: "top",
+                        labels: {
+                          usePointStyle: true,
+                          pointStyle: 'circle',
+                          color: '#64748b',
+                          font: {
+                            size: 12,
+                            weight: '500',
+                          },
+                          padding: 20,
+                        },
+                      },
+                      tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 2,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        usePointStyle: true,
                       },
                     },
                     scales: {
                       x: {
                         stacked: true,
+                        grid: {
+                          display: false,
+                        },
+                        ticks: {
+                          color: '#64748b',
+                          font: {
+                            size: 12,
+                            weight: '500',
+                          },
+                        },
                       },
                       y: {
                         stacked: true,
+                        grid: {
+                          color: 'rgba(148, 163, 184, 0.1)',
+                          lineWidth: 1,
+                        },
+                        ticks: {
+                          color: '#64748b',
+                          font: {
+                            size: 12,
+                            weight: '500',
+                          },
+                          stepSize: 1,
+                        },
                       },
                     },
                   }}
-                />
+                  />
+                </div>
               </ChartCard>
             </div>
           </div>

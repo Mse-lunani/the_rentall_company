@@ -11,10 +11,26 @@ window.initDataTable = function() {
             console.log("Initializing DataTable with title:", tableTitle);
             
             table.DataTable({
-                order: [[0, 'asc']], // Sort by first column
+                order: [[1, 'asc']], // Sort by first data column (Name)
                 dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
                 displayLength: 7,
                 lengthMenu: [7, 10, 25, 50, 75, 100],
+                responsive: {
+                    details: {
+                        type: 'column',
+                        target: 'tr'
+                    }
+                },
+                columnDefs: [
+                    {
+                        className: 'dtr-control',
+                        orderable: false,
+                        targets: 0, // First column for control
+                        width: '15px',
+                        data: null,
+                        defaultContent: ''
+                    }
+                ],
                 buttons: [
                     {
                         extend: 'collection',

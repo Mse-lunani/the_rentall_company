@@ -2,9 +2,21 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function OwnerTable({ owners, onView, onDelete }) {
   const router = useRouter();
+
+  // Initialize DataTable after owners load
+  useEffect(() => {
+    if (owners.length > 0) {
+      setTimeout(() => {
+        if (window.initDataTable) {
+          window.initDataTable();
+        }
+      }, 100);
+    }
+  }, [owners]);
 
   const handleView = (owner) => {
     onView(owner);
@@ -30,25 +42,26 @@ export default function OwnerTable({ owners, onView, onDelete }) {
           <i className="fas fa-plus"></i> Add Owner
         </Link>
       </div>
-      <div className="card-body table-responsive p-0">
-        <table className="table table-hover text-nowrap">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Full Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>National ID</th>
-              <th>Password</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      <div className="card-body">
+        <div className="table-responsive">
+          <table className="table table-bordered table-striped datatables-basic" data-name="Owner Records">
+            <thead>
+              <tr>
+                <th style={{width: '15px'}}></th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>National ID</th>
+                <th>Password</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
           <tbody>
             {owners.map((owner, index) => (
               <tr key={owner.id}>
-                <td>{index + 1}</td>
-                <td>{owner.full_name}</td>
+                <td></td>
+                <td><strong>{owner.full_name}</strong></td>
                 <td>{owner.phone}</td>
                 <td>{owner.email}</td>
                 <td>{owner.national_id || "N/A"}</td>
@@ -59,35 +72,42 @@ export default function OwnerTable({ owners, onView, onDelete }) {
                 </td>
                 <td>{formatDate(owner.created_at)}</td>
                 <td>
-                  <Link
-                    href={`/dashboard/owners/${owner.id}`}
-                    className="btn btn-sm btn-success me-1"
-                  >
-                    <i className="fas fa-eye"></i> Details
-                  </Link>
-                  <button
-                    className="btn btn-sm btn-info me-1"
-                    onClick={() => handleView(owner)}
-                  >
-                    <i className="fas fa-info-circle"></i> Quick View
-                  </button>
-                  <Link
-                    href={`/dashboard/owners/edit/${owner.id}`}
-                    className="btn btn-warning btn-sm me-1"
-                  >
-                    <i className="fas fa-edit"></i> Edit
-                  </Link>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDelete(owner.id)}
-                  >
-                    <i className="fas fa-trash"></i> Delete
-                  </button>
+                  <div className="btn-group" role="group">
+                    <Link
+                      href={`/dashboard/owners/${owner.id}`}
+                      className="btn btn-success btn-sm"
+                      title="View Details"
+                    >
+                      <i className="bx bx-show"></i>
+                    </Link>
+                    <button
+                      className="btn btn-info btn-sm"
+                      onClick={() => handleView(owner)}
+                      title="Quick View"
+                    >
+                      <i className="bx bx-info-circle"></i>
+                    </button>
+                    <Link
+                      href={`/dashboard/owners/edit/${owner.id}`}
+                      className="btn btn-warning btn-sm"
+                      title="Edit Owner"
+                    >
+                      <i className="bx bx-edit"></i>
+                    </Link>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(owner.id)}
+                      title="Delete Owner"
+                    >
+                      <i className="bx bx-trash"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
         {owners.length === 0 && (
           <div className="text-center p-4">
             <p className="text-muted">No owners found.</p>

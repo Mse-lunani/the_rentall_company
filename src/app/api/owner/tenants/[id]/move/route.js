@@ -1,4 +1,4 @@
-import { requireOwnerIdOr401, sql } from "../../_common.js";
+import { requireOwnerIdOr401, sql } from "../../../_common.js";
 
 export async function POST(req, { params }) {
   const { error, ownerId } = requireOwnerIdOr401(req);
@@ -7,20 +7,23 @@ export async function POST(req, { params }) {
   try {
     const resolvedParams = await params;
     const tenantId = parseInt(resolvedParams.id);
-    
-    const { 
-      new_unit_id, 
-      move_date, 
-      new_monthly_rent, 
-      new_deposit_paid, 
-      move_reason, 
-      notes 
+
+    const {
+      new_unit_id,
+      move_date,
+      new_monthly_rent,
+      new_deposit_paid,
+      move_reason,
+      notes,
     } = await req.json();
 
     if (!tenantId || !new_unit_id || !move_date) {
-      return Response.json({ 
-        error: "tenant_id, new_unit_id, and move_date are required" 
-      }, { status: 400 });
+      return Response.json(
+        {
+          error: "tenant_id, new_unit_id, and move_date are required",
+        },
+        { status: 400 }
+      );
     }
 
     // Verify tenant exists and is owned by this owner
@@ -33,9 +36,12 @@ export async function POST(req, { params }) {
     `;
 
     if (!tenant) {
-      return Response.json({
-        error: "Tenant not found or not owned by this owner"
-      }, { status: 403 });
+      return Response.json(
+        {
+          error: "Tenant not found or not owned by this owner",
+        },
+        { status: 403 }
+      );
     }
 
     // Verify new unit is available and owned by this owner
@@ -48,15 +54,21 @@ export async function POST(req, { params }) {
     `;
 
     if (!newUnit) {
-      return Response.json({
-        error: "New unit not found or not owned by this owner"
-      }, { status: 403 });
+      return Response.json(
+        {
+          error: "New unit not found or not owned by this owner",
+        },
+        { status: 403 }
+      );
     }
 
     if (newUnit.is_occupied) {
-      return Response.json({
-        error: "Target unit is already occupied"
-      }, { status: 400 });
+      return Response.json(
+        {
+          error: "Target unit is already occupied",
+        },
+        { status: 400 }
+      );
     }
 
     // Get current active tenancy
@@ -71,9 +83,12 @@ export async function POST(req, { params }) {
     `;
 
     if (!currentTenancy) {
-      return Response.json({
-        error: "No active tenancy found for this tenant"
-      }, { status: 400 });
+      return Response.json(
+        {
+          error: "No active tenancy found for this tenant",
+        },
+        { status: 400 }
+      );
     }
 
     // Begin transaction-like operations
@@ -84,7 +99,9 @@ export async function POST(req, { params }) {
         end_date = ${move_date},
         occupancy_status = 'terminated',
         termination_reason = 'transferred',
-        notes = ${move_reason ? `Moved: ${move_reason}` : 'Moved to different unit'},
+        notes = ${
+          move_reason ? `Moved: ${move_reason}` : "Moved to different unit"
+        },
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${currentTenancy.id}
     `;
@@ -96,7 +113,9 @@ export async function POST(req, { params }) {
         tenant_id, unit_id, start_date, occupancy_status, monthly_rent,
         deposit_paid, notes, created_at, updated_at
       ) VALUES (
-        ${tenantId}, ${parseInt(new_unit_id)}, ${move_date}, 'active', ${finalRent},
+        ${tenantId}, ${parseInt(
+      new_unit_id
+    )}, ${move_date}, 'active', ${finalRent},
         ${new_deposit_paid || null}, ${notes || null}, 
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       ) RETURNING *
@@ -129,9 +148,8 @@ export async function POST(req, { params }) {
       message: "Tenant moved successfully",
       new_tenancy: newTenancy,
       tenant_name: tenant.full_name,
-      new_unit_name: newUnit.name
+      new_unit_name: newUnit.name,
     });
-
   } catch (error) {
     console.error("POST /api/owner/tenants/:id/move error:", error);
     return Response.json(

@@ -1,4 +1,4 @@
-import { requireOwnerIdOr401, sql } from "../../_common.js";
+import { requireOwnerIdOr401, sql } from "../../../_common.js";
 
 export async function PUT(req, { params }) {
   const { error, ownerId } = requireOwnerIdOr401(req);
@@ -14,9 +14,12 @@ export async function PUT(req, { params }) {
     }
 
     if (!end_date || !termination_reason) {
-      return Response.json({ 
-        error: "end_date and termination_reason are required" 
-      }, { status: 400 });
+      return Response.json(
+        {
+          error: "end_date and termination_reason are required",
+        },
+        { status: 400 }
+      );
     }
 
     // Verify the tenancy belongs to the owner
@@ -31,17 +34,29 @@ export async function PUT(req, { params }) {
     `;
 
     if (!tenancy) {
-      return Response.json({
-        error: "Active tenancy not found or not owned by this owner"
-      }, { status: 403 });
+      return Response.json(
+        {
+          error: "Active tenancy not found or not owned by this owner",
+        },
+        { status: 403 }
+      );
     }
 
     // Valid termination reasons
-    const validReasons = ['evicted', 'lease-expired', 'voluntary', 'transferred'];
+    const validReasons = [
+      "evicted",
+      "lease-expired",
+      "voluntary",
+      "transferred",
+    ];
     if (!validReasons.includes(termination_reason)) {
-      return Response.json({
-        error: "Invalid termination reason. Must be: " + validReasons.join(', ')
-      }, { status: 400 });
+      return Response.json(
+        {
+          error:
+            "Invalid termination reason. Must be: " + validReasons.join(", "),
+        },
+        { status: 400 }
+      );
     }
 
     // Terminate the tenancy
@@ -67,9 +82,8 @@ export async function PUT(req, { params }) {
     return Response.json({
       success: true,
       message: "Tenancy terminated successfully",
-      tenancy: updated
+      tenancy: updated,
     });
-
   } catch (error) {
     console.error("PUT /api/owner/tenancies/:id/terminate error:", error);
     return Response.json(

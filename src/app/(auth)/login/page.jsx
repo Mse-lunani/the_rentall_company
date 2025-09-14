@@ -34,9 +34,12 @@ export default function LoginPage() {
                 </div>
                 {/* /Logo */}
 
+                <div className="text-center mb-3">
+                  <span className="badge bg-primary fs-6 px-3 py-2">Admin Portal</span>
+                </div>
                 <h4 className="mb-2">Welcome to The Rentall Company 👋</h4>
                 <p className="mb-4">
-                  Please sign-in to your account and start the adventure
+                  Admin login - Please sign-in to your admin account
                 </p>
 
                 <form
@@ -114,6 +117,15 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </form>
+
+                <div className="text-center mt-3">
+                  <p className="text-muted">
+                    Are you a property owner?{" "}
+                    <a href="/owner-login" className="text-primary">
+                      Login as Owner
+                    </a>
+                  </p>
+                </div>
               </div>
             </div>
             {/* /Register */}

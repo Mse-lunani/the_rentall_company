@@ -1,0 +1,17 @@
+name: Hourly Next.js Endpoint Trigger
+
+on:
+  schedule:
+    - cron: "*/3 * * * *" # Runs every 3 minutes for testing purposes.
+  workflow_dispatch: # Allows manual triggering for testing.
+
+jobs:
+  trigger-endpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API endpoint
+        run: |
+          curl -X POST https://the-rentall-company-gamma.vercel.app/api/cron-task \
+          -H "Authorization: Bearer ${{ secrets.API_SECRET }}" \
+          -H "Content-Type: application/json" \
+          -d '{"task": "run"}'

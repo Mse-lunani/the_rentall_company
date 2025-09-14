@@ -120,8 +120,7 @@ export default function MoveTenantPage({ params }) {
             <div>
               <h1>Move Tenant: {tenant.full_name}</h1>
               <p className="text-muted mb-0">
-                Current Unit: {tenant.unit_name || tenant.legacy_unit_name} 
-                ({tenant.building_name || tenant.legacy_building_name})
+                Current Unit: {tenant.unit_name} ({tenant.building_name})
               </p>
             </div>
             <div>
@@ -142,8 +141,8 @@ export default function MoveTenantPage({ params }) {
                   <h5 className="card-title">Current Tenancy</h5>
                 </div>
                 <div className="card-body">
-                  <p><strong>Unit:</strong> {tenant.unit_name || tenant.legacy_unit_name}</p>
-                  <p><strong>Building:</strong> {tenant.building_name || tenant.legacy_building_name}</p>
+                  <p><strong>Unit:</strong> {tenant.unit_name}</p>
+                  <p><strong>Building:</strong> {tenant.building_name}</p>
                   <p><strong>Current Rent:</strong> KES {tenant.tenancy_rent ? Number(tenant.tenancy_rent).toLocaleString() : 'N/A'}</p>
                   {tenant.start_date && (
                     <p><strong>Start Date:</strong> {new Date(tenant.start_date).toLocaleDateString()}</p>

@@ -15,7 +15,7 @@ export async function GET() {
     const [occupiedUnits] = await sql`
       SELECT COUNT(*) 
       FROM units 
-      WHERE id IN (SELECT unit_id FROM tenants WHERE unit_id IS NOT NULL)
+      WHERE id IN (SELECT unit_id FROM tenants_units WHERE occupancy_status = 'active')
     `;
     const [totalMaintenance] = await sql`SELECT COUNT(*) FROM maintenance_logs`;
 
@@ -34,8 +34,8 @@ export async function GET() {
     const occupancyData = await sql`
       SELECT 
         b.name AS building,
-        COUNT(u.id) FILTER (WHERE u.id IN (SELECT unit_id FROM tenants)) AS occupied,
-        COUNT(u.id) FILTER (WHERE u.id NOT IN (SELECT unit_id FROM tenants WHERE unit_id IS NOT NULL)) AS vacant
+        COUNT(u.id) FILTER (WHERE u.id IN (SELECT unit_id FROM tenants_units WHERE occupancy_status = 'active')) AS occupied,
+        COUNT(u.id) FILTER (WHERE u.id NOT IN (SELECT unit_id FROM tenants_units WHERE occupancy_status = 'active')) AS vacant
       FROM buildings b
       LEFT JOIN units u ON b.id = u.building_id
       GROUP BY b.name

@@ -5,13 +5,14 @@ import Script from "next/script";
 
 export default function LoginPage() {
   // If you want to show an error message based on ?error=… in the URL, you can do:
-  const [hasError, setHasError] = useState(false);
+  const [errorType, setErrorType] = useState(null);
 
   useEffect(() => {
-    // check URL query for error (e.g. ?error=1)
+    // check URL query for error (e.g. ?error=invalid_credentials)
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error")) {
-      setHasError(true);
+    const error = params.get("error");
+    if (error) {
+      setErrorType(error);
     }
   }, []);
 
@@ -48,11 +49,13 @@ export default function LoginPage() {
                   action="/api/login"
                   method="POST"
                 >
-                  {hasError && (
+                  {errorType && (
                     <div className="mb-3">
-                      <span className="p-3 text-danger">
-                        Wrong email or password
-                      </span>
+                      <div className="alert alert-danger" role="alert">
+                        {errorType === 'invalid_credentials' && "Wrong email or password"}
+                        {errorType === 'missing_fields' && "Please fill in all fields"}
+                        {errorType === 'server_error' && "We're experiencing server issues. Please try again later."}
+                      </div>
                     </div>
                   )}
 

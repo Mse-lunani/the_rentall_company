@@ -105,10 +105,6 @@ export async function POST(req, { params }) {
         ) RETURNING *
       `;
 
-      // Update legacy tenants.unit_id for backward compatibility during Phase 2
-      await sql`
-        UPDATE tenants SET unit_id = ${new_unit_id} WHERE id = ${tenantId}
-      `;
 
       await sql`COMMIT`;
 

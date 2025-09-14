@@ -22,22 +22,18 @@ export default function TenantTable({ tenants, onView, onDelete }) {
 
   const getTenancyStatusBadge = (status) => {
     const statusMap = {
-      'HAS_ACTIVE_TENANCY': { class: 'bg-dark text-white', text: 'Active Tenancy' },
-      'LEGACY_ONLY': { class: 'bg-dark text-white', text: 'Legacy Only' },
-      'NO_UNIT': { class: 'bg-dark text-white', text: 'No Unit' }
+      'HAS_ACTIVE_TENANCY': { class: 'bg-success text-white', text: 'Active Tenancy' },
+      'NO_UNIT': { class: 'bg-warning text-dark', text: 'No Unit' }
     };
-    const statusInfo = statusMap[status] || { class: 'bg-dark text-white', text: 'Unknown' };
+    const statusInfo = statusMap[status] || { class: 'bg-secondary text-white', text: 'Unknown' };
     return (
       <span className={`badge ${statusInfo.class}`}>{statusInfo.text}</span>
     );
   };
 
   const getUnitInfo = (tenant) => {
-    // Prefer new tenancy structure, fall back to legacy
-    if (tenant.current_unit_id && tenant.unit_name) {
+    if (tenant.unit_id && tenant.unit_name) {
       return `${tenant.unit_name} (${tenant.building_name || 'N/A'})`;
-    } else if (tenant.legacy_unit_name) {
-      return `${tenant.legacy_unit_name} (${tenant.legacy_building_name || 'N/A'})`;
     }
     return 'No Unit Assigned';
   };

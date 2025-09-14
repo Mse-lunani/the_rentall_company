@@ -1,110 +1,86 @@
 /* Modern Chart Styling */
 .modern-chart-card {
-  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
-  border-radius: 20px;
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 10px 15px -3px rgba(0, 0, 0, 0.05),
-    0 0 0 1px rgba(255, 255, 255, 0.8);
+  background: #ffffff;
+  border-radius: 16px;
   border: none;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .modern-chart-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 
-    0 10px 25px -3px rgba(0, 0, 0, 0.1),
-    0 20px 40px -6px rgba(0, 0, 0, 0.05),
-    0 0 0 1px rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .modern-chart-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, 
-    #667eea 0%, 
-    #764ba2 25%, 
-    #f093fb 50%, 
-    #f5576c 75%, 
-    #4facfe 100%);
-  opacity: 0.8;
+  height: 3px;
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  opacity: 0.9;
 }
 
 .modern-chart-header {
-  padding: 1.5rem 2rem 1rem;
+  padding: 1.5rem 1.5rem 0.75rem;
   background: transparent;
   border: none;
-  position: relative;
 }
 
 .modern-chart-title {
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #1a202c;
   margin: 0;
   letter-spacing: -0.025em;
-  position: relative;
-}
-
-.modern-chart-title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 1px;
 }
 
 .modern-chart-body {
-  padding: 0 2rem 2rem;
+  padding: 1rem 1.5rem 1.5rem;
   position: relative;
 }
 
 /* Chart Container Enhancements */
 .modern-chart-body canvas {
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+/* Bar Chart Specific Styles */
+.chart-bar {
+  border-radius: 4px 4px 0 0 !important;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .modern-chart-card {
-    border-radius: 16px;
+    border-radius: 12px;
     margin-bottom: 1.5rem;
   }
-  
+
   .modern-chart-header {
-    padding: 1.25rem 1.5rem 0.75rem;
+    padding: 1.25rem 1.25rem 0.5rem;
   }
-  
+
   .modern-chart-body {
-    padding: 0 1.5rem 1.5rem;
-  }
-  
-  .modern-chart-title {
-    font-size: 1rem;
+    padding: 0.75rem 1.25rem 1.25rem;
   }
 }
 
 /* Animation for chart loading */
 .modern-chart-body {
-  animation: fadeInUp 0.6s ease-out;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -112,36 +88,52 @@
   }
 }
 
-/* Glassmorphism effect for dark mode compatibility */
-@media (prefers-color-scheme: dark) {
+/* Dark Theme */
+/* @media (prefers-color-scheme: dark) {
   .modern-chart-card {
-    background: linear-gradient(135deg, 
-      rgba(15, 23, 42, 0.9) 0%, 
-      rgba(30, 41, 59, 0.8) 100%);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1a202c;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
-  
+
+  .modern-chart-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  }
+
   .modern-chart-title {
-    color: #f1f5f9;
+    color: #e2e8f0;
   }
-  
+
   .modern-chart-body canvas {
     background: rgba(0, 0, 0, 0.2);
   }
-}
 
-/* Custom scrollbar for mobile */
+  .modern-chart-card::before {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  }
+} */
+
+/* Custom scrollbar */
 .modern-chart-body::-webkit-scrollbar {
-  height: 4px;
+  height: 6px;
 }
 
 .modern-chart-body::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .modern-chart-body::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 2px;
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+  .modern-chart-body::-webkit-scrollbar-track {
+    background: #2d3748;
+  }
+
+  .modern-chart-body::-webkit-scrollbar-thumb {
+    background: #4a5568;
+  }
 }

@@ -14,9 +14,7 @@ export async function POST(req) {
     monthly_rent, 
     deposit_paid,
     lease_terms,
-    notes,
-    // Backward compatibility
-    use_legacy_only = false 
+    notes
   } = body;
 
   if (!full_name || !phone || !unit_id) {
@@ -28,75 +26,62 @@ export async function POST(req) {
     const randomPassword = Math.floor(Math.random() * 9000) + 1000;
     const passwordHash = crypto.createHash("md5").update(randomPassword.toString()).digest("hex");
 
-    // Begin transaction for Phase 2: Create both tenant and tenancy
+    // Begin transaction: Create both tenant and tenancy
     await sql`BEGIN`;
 
     try {
-      // Create tenant record (keeping unit_id for backward compatibility)
+      // Create tenant record
       const [tenant] = await sql`
-        INSERT INTO tenants (full_name, phone, email, unit_id, password, password_text)
-        VALUES (${full_name}, ${phone}, ${email || null}, ${unit_id}, ${passwordHash}, ${randomPassword.toString()})
+        INSERT INTO tenants (full_name, phone, email, password, password_text)
+        VALUES (${full_name}, ${phone}, ${email || null}, ${passwordHash}, ${randomPassword.toString()})
         RETURNING *
       `;
+      // Get unit details for rent amount
+      const [unit] = await sql`
+        SELECT rent_amount_kes, deposit_amount_kes FROM units WHERE id = ${unit_id}
+      `;
 
-      // If not legacy-only mode, also create tenancy record
-      if (!use_legacy_only) {
-        // Get unit details for rent amount
-        const [unit] = await sql`
-          SELECT rent_amount_kes, deposit_amount_kes FROM units WHERE id = ${unit_id}
-        `;
-
-        if (!unit) {
-          await sql`ROLLBACK`;
-          return Response.json({ error: "Unit not found" }, { status: 400 });
-        }
-
-        // Check if unit is already occupied
-        const [existingTenancy] = await sql`
-          SELECT id FROM tenants_units WHERE unit_id = ${unit_id} AND occupancy_status = 'active'
-        `;
-
-        if (existingTenancy) {
-          await sql`ROLLBACK`;
-          return Response.json({ error: "Unit is already occupied" }, { status: 400 });
-        }
-
-        // Create tenancy record
-        const [tenancy] = await sql`
-          INSERT INTO tenants_units (
-            tenant_id, unit_id, start_date, occupancy_status, 
-            monthly_rent, deposit_paid, lease_terms, notes
-          ) VALUES (
-            ${tenant.id}, 
-            ${unit_id}, 
-            ${start_date || new Date().toISOString().split('T')[0]}, 
-            'active',
-            ${monthly_rent || unit.rent_amount_kes}, 
-            ${deposit_paid || unit.deposit_amount_kes}, 
-            ${lease_terms || null}, 
-            ${notes || null}
-          ) RETURNING *
-        `;
-
-        await sql`COMMIT`;
-
-        return Response.json({ 
-          success: true, 
-          tenant_id: tenant.id, 
-          tenancy_id: tenancy.id,
-          password: randomPassword,
-          message: "Tenant and tenancy created successfully"
-        });
-      } else {
-        // Legacy mode - just create tenant
-        await sql`COMMIT`;
-        return Response.json({ 
-          success: true, 
-          tenant_id: tenant.id, 
-          password: randomPassword,
-          message: "Tenant created in legacy mode"
-        });
+      if (!unit) {
+        await sql`ROLLBACK`;
+        return Response.json({ error: "Unit not found" }, { status: 400 });
       }
+
+      // Check if unit is already occupied
+      const [existingTenancy] = await sql`
+        SELECT id FROM tenants_units WHERE unit_id = ${unit_id} AND occupancy_status = 'active'
+      `;
+
+      if (existingTenancy) {
+        await sql`ROLLBACK`;
+        return Response.json({ error: "Unit is already occupied" }, { status: 400 });
+      }
+
+      // Create tenancy record
+      const [tenancy] = await sql`
+        INSERT INTO tenants_units (
+          tenant_id, unit_id, start_date, occupancy_status, 
+          monthly_rent, deposit_paid, lease_terms, notes
+        ) VALUES (
+          ${tenant.id}, 
+          ${unit_id}, 
+          ${start_date || new Date().toISOString().split('T')[0]}, 
+          'active',
+          ${monthly_rent || unit.rent_amount_kes}, 
+          ${deposit_paid || unit.deposit_amount_kes}, 
+          ${lease_terms || null}, 
+          ${notes || null}
+        ) RETURNING *
+      `;
+
+      await sql`COMMIT`;
+
+      return Response.json({ 
+        success: true, 
+        tenant_id: tenant.id, 
+        tenancy_id: tenancy.id,
+        password: randomPassword,
+        message: "Tenant and tenancy created successfully"
+      });
 
     } catch (transactionError) {
       await sql`ROLLBACK`;
@@ -119,7 +104,7 @@ export async function GET(req) {
   
   if (!id || isNaN(id)) {
     try {
-      // Get all tenants with both legacy and new structure support
+      // Get all tenants with current tenancy information
       const tenants = await sql`
         SELECT 
           t.id, 
@@ -128,17 +113,11 @@ export async function GET(req) {
           t.email, 
           t.password_text, 
           t.created_at,
-          -- Legacy fields for backward compatibility
-          t.unit_id as legacy_unit_id,
-          u_legacy.name as legacy_unit_name,
-          u_legacy.rent_amount_kes as legacy_rent,
-          b_legacy.name as legacy_building_name,
-          -- New structure fields
-          tu.unit_id as current_unit_id,
-          u_current.name as unit_name,
-          u_current.name as unit_number,
-          u_current.rent_amount_kes,
-          b_current.name AS building_name,
+          tu.unit_id,
+          u.name as unit_name,
+          u.name as unit_number,
+          u.rent_amount_kes,
+          b.name AS building_name,
           tu.start_date,
           tu.occupancy_status,
           tu.monthly_rent as tenancy_rent,
@@ -146,17 +125,12 @@ export async function GET(req) {
           -- Tenancy status
           CASE 
             WHEN tu.id IS NOT NULL THEN 'HAS_ACTIVE_TENANCY'
-            WHEN t.unit_id IS NOT NULL THEN 'LEGACY_ONLY'
             ELSE 'NO_UNIT'
           END as tenancy_status
         FROM tenants t
-        -- Legacy unit relationship (for backward compatibility)
-        LEFT JOIN units u_legacy ON t.unit_id = u_legacy.id
-        LEFT JOIN buildings b_legacy ON u_legacy.building_id = b_legacy.id
-        -- New tenancy relationship
         LEFT JOIN tenants_units tu ON t.id = tu.tenant_id AND tu.occupancy_status = 'active'
-        LEFT JOIN units u_current ON tu.unit_id = u_current.id
-        LEFT JOIN buildings b_current ON u_current.building_id = b_current.id
+        LEFT JOIN units u ON tu.unit_id = u.id
+        LEFT JOIN buildings b ON u.building_id = b.id
         ORDER BY t.full_name
       `;
 
@@ -179,19 +153,13 @@ export async function GET(req) {
           t.email, 
           t.password_text,
           t.created_at,
-          -- Legacy fields
-          t.unit_id as legacy_unit_id,
-          u_legacy.name as legacy_unit_name,
-          u_legacy.rent_amount_kes as legacy_rent,
-          b_legacy.name as legacy_building_name,
-          -- Current tenancy
-          tu.unit_id as current_unit_id,
+          tu.unit_id,
           tu.id as current_tenancy_id,
-          u_current.name as unit_number,
-          u_current.id as unit_id,
-          u_current.name as unit_name,
-          u_current.rent_amount_kes,
-          b_current.name AS building_name,
+          u.name as unit_number,
+          u.id as unit_id,
+          u.name as unit_name,
+          u.rent_amount_kes,
+          b.name AS building_name,
           tu.start_date,
           tu.occupancy_status,
           tu.monthly_rent as tenancy_rent,
@@ -199,13 +167,9 @@ export async function GET(req) {
           tu.lease_terms,
           tu.notes as tenancy_notes
         FROM tenants t
-        -- Legacy relationship
-        LEFT JOIN units u_legacy ON t.unit_id = u_legacy.id
-        LEFT JOIN buildings b_legacy ON u_legacy.building_id = b_legacy.id
-        -- Current active tenancy
         LEFT JOIN tenants_units tu ON t.id = tu.tenant_id AND tu.occupancy_status = 'active'
-        LEFT JOIN units u_current ON tu.unit_id = u_current.id
-        LEFT JOIN buildings b_current ON u_current.building_id = b_current.id
+        LEFT JOIN units u ON tu.unit_id = u.id
+        LEFT JOIN buildings b ON u.building_id = b.id
         WHERE t.id = ${Number(id)}
       `;
 
@@ -220,10 +184,7 @@ export async function GET(req) {
             tu.*,
             u.name as unit_name,
             b.name as building_name,
-            EXTRACT(days FROM 
-              CASE WHEN tu.end_date IS NULL THEN CURRENT_DATE ELSE tu.end_date END 
-              - tu.start_date
-            ) as duration_days
+            (CASE WHEN tu.end_date IS NULL THEN CURRENT_DATE ELSE tu.end_date END - tu.start_date) as duration_days
           FROM tenants_units tu
           JOIN units u ON tu.unit_id = u.id
           JOIN buildings b ON u.building_id = b.id

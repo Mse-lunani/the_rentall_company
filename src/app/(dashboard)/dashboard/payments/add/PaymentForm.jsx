@@ -151,7 +151,7 @@ export default function PaymentForm() {
             </div>
           ) : selectedTenant.tenancy_status === 'HAS_ACTIVE_TENANCY' ? (
             <div className="alert alert-info">
-              <strong>Unit:</strong> {selectedTenant.unit_name || selectedTenant.legacy_unit_name || "N/A"}
+              <strong>Unit:</strong> {selectedTenant.unit_name || "N/A"}
               <br />
               <strong>Expected Rent:</strong> Ksh {rent.toLocaleString()}
             </div>

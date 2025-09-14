@@ -6,29 +6,50 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
-  // ✅ Early return if id is missing or not a valid integer
-  if (!id || isNaN(id)) {
-    return Response.json(
-      { error: "Missing or invalid id parameter" },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const result = await sql`
-      SELECT *
-      FROM units
-      WHERE id = ${Number(id)}
-    `;
-
-    if (result.length === 0) {
-      return Response.json({ error: "Unit not found" }, { status: 404 });
+  if (id) {
+    // Get single unit by id
+    if (isNaN(id)) {
+      return Response.json(
+        { error: "Invalid id parameter" },
+        { status: 400 }
+      );
     }
 
-    return Response.json(result[0]);
-  } catch (err) {
-    console.error("GET /api/units error:", err);
-    return Response.json({ error: "Failed to fetch unit" }, { status: 500 });
+    try {
+      const result = await sql`
+        SELECT *
+        FROM units
+        WHERE id = ${Number(id)}
+      `;
+
+      if (result.length === 0) {
+        return Response.json({ error: "Unit not found" }, { status: 404 });
+      }
+
+      return Response.json(result[0]);
+    } catch (err) {
+      console.error("GET /api/units single error:", err);
+      return Response.json({ error: "Failed to fetch unit" }, { status: 500 });
+    }
+  } else {
+    // Get all units with occupancy status
+    try {
+      const result = await sql`
+        SELECT 
+          u.*,
+          b.name as building_name,
+          CASE WHEN tu.id IS NOT NULL THEN true ELSE false END as is_occupied
+        FROM units u
+        LEFT JOIN buildings b ON u.building_id = b.id
+        LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
+        ORDER BY u.name
+      `;
+
+      return Response.json(result);
+    } catch (err) {
+      console.error("GET /api/units all error:", err);
+      return Response.json({ error: "Failed to fetch units" }, { status: 500 });
+    }
   }
 }
 
@@ -59,15 +80,16 @@ export async function DELETE(req) {
   }
 
   try {
-    const units = await sql`
+    // Check if unit has active tenancies
+    const tenancies = await sql`
       SELECT COUNT(*)::int AS count
-      FROM tenants
-      WHERE unit_id = ${Number(id)}
+      FROM tenants_units
+      WHERE unit_id = ${Number(id)} AND occupancy_status = 'active'
     `;
 
-    if (units[0]?.count > 0) {
+    if (tenancies[0]?.count > 0) {
       return Response.json(
-        { error: "Unit has tenant. Cannot delete." },
+        { error: "Unit has active tenant. Cannot delete." },
         { status: 400 }
       );
     }

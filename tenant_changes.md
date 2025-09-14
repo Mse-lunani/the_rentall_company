@@ -420,12 +420,12 @@ POST /api/tenants/:id/move - Move tenant between units
 ```javascript
 // Update tenant queries to support both old and new structure
 // Keep backward compatibility during transition
-SELECT t.*, 
+SELECT t.*,
        t.unit_id as legacy_unit_id,  -- Keep old field
        tu.unit_id as current_unit_id, -- New structure
        tu.start_date, tu.occupancy_status
 FROM tenants t
-LEFT JOIN tenants_units tu ON t.id = tu.tenant_id 
+LEFT JOIN tenants_units tu ON t.id = tu.tenant_id
     AND tu.occupancy_status = 'active'
 ```
 
@@ -478,43 +478,3 @@ tenants (
     -- emergency_contact, id_number, employment_info
 )
 ```
-
-## **Revised Implementation Timeline**
-
-### **Week 1: Phase 1 - Database Foundation**
-- Day 1: Create tenants_units table with constraints and indexes
-- Day 2: Migrate existing tenant-unit data to junction table
-- Day 3: Update payments table with tenancy_id and unit_id
-- Day 4: Update maintenance_logs with tenancy references
-- Day 5-7: Data validation and integrity testing
-
-### **Week 2: Phase 2 - API Development**
-- Day 1-3: Create new tenancy management API endpoints
-- Day 4-5: Update existing APIs for parallel support (old + new)
-- Day 6-7: Comprehensive API testing and documentation
-
-### **Week 3: Phase 3 - Application Integration**
-- Day 1-3: Update admin dashboard to use new structure
-- Day 4-5: Implement tenancy management features
-- Day 6-7: Test all existing functionality with new backend
-
-### **Week 4: Phase 4 - Legacy Cleanup & Owner Dashboard Start**
-- Day 1-2: Final verification that unit_id is no longer needed
-- Day 3: Remove tenants.unit_id column (POINT OF NO RETURN)
-- Day 4-7: Begin owner dashboard implementation with clean structure
-
-## **Critical Success Factors**
-
-### **Data Safety**
-- ✅ Complete backup before any changes
-- ✅ Test migration on development copy first
-- ✅ Maintain dual support during transition
-- ✅ Rollback plan for each phase
-
-### **Application Continuity**
-- ✅ No downtime during Phase 1-3
-- ✅ Existing functionality preserved
-- ✅ Gradual feature rollout
-- ✅ User training on new capabilities
-
-**IMPORTANT**: Only remove `tenants.unit_id` in Phase 4 after confirming all systems work with the new structure.

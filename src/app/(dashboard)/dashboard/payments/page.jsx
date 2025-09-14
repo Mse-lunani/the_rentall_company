@@ -69,19 +69,11 @@ export default function PaymentsPage() {
                           {p.phone && <><br/><small className="text-muted">{p.phone}</small></>}
                         </td>
                         <td>
-                          {p.payment_unit_name ? (
+                          {p.unit_name ? (
                             <div>
-                              <strong>{p.payment_unit_name}</strong>
+                              <strong>{p.unit_name}</strong>
                               <br/>
-                              <small className="text-muted">{p.payment_building_name}</small>
-                            </div>
-                          ) : p.legacy_unit_number ? (
-                            <div>
-                              <span>{p.legacy_unit_number}</span>
-                              <br/>
-                              <small className="text-muted">{p.legacy_building_name}</small>
-                              <br/>
-                              <span className="badge badge-warning">Legacy</span>
+                              <small className="text-muted">{p.building_name}</small>
                             </div>
                           ) : (
                             <span className="text-muted">No Unit Info</span>
@@ -91,13 +83,13 @@ export default function PaymentsPage() {
                         <td>{new Date(p.date_paid).toLocaleDateString()}</td>
                         <td>
                           {p.payment_tracking_status === 'LINKED_TO_TENANCY' && (
-                            <span className="badge bg-dark text-white">Tenancy Linked</span>
+                            <span className="badge bg-success text-white">Tenancy Linked</span>
                           )}
                           {p.payment_tracking_status === 'LINKED_TO_UNIT' && (
-                            <span className="badge bg-info text-white">Unit Linked</span>
+                            <span className="badge bg-info text-white">Unit Only</span>
                           )}
-                          {p.payment_tracking_status === 'LEGACY_ONLY' && (
-                            <span className="badge bg-warning text-dark">Legacy Only</span>
+                          {p.payment_tracking_status === 'NO_LINK' && (
+                            <span className="badge bg-warning text-dark">No Link</span>
                           )}
                         </td>
                         <td>{p.notes || '-'}</td>

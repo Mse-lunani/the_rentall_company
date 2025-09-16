@@ -13,9 +13,10 @@ export default function PaymentForm({ initialData = null }) {
 
   const [tenants, setTenants] = useState([]);
   const [selectedTenant, setSelectedTenant] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetch("/api/tenants")
+    fetch("/api/owner/tenants")
       .then((res) => res.json())
       .then((data) => {
         setTenants(data || []);
@@ -48,6 +49,8 @@ export default function PaymentForm({ initialData = null }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const payload = {
       tenant_id: form.tenantId,
       amount_paid: parseFloat(form.amount),
@@ -57,21 +60,27 @@ export default function PaymentForm({ initialData = null }) {
 
     const method = initialData ? "PATCH" : "POST";
     const url = initialData
-      ? `/api/payments?id=${initialData.id}`
-      : "/api/payments";
+      ? `/api/owner/payments?id=${initialData.id}`
+      : "/api/owner/payments";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const result = await res.json();
-    if (res.ok) {
-      alert(`Payment ${initialData ? "updated" : "added"} successfully`);
-      router.push("/dashboard/payments");
-    } else {
-      alert(result.error || "Failed");
+      const result = await res.json();
+      if (res.ok) {
+        alert(`Payment ${initialData ? "updated" : "added"} successfully`);
+        router.push("/owner_dashboard/payments");
+      } else {
+        alert(result.error || "Failed");
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+      setIsSubmitting(false);
     }
   };
 
@@ -156,8 +165,8 @@ export default function PaymentForm({ initialData = null }) {
         />
       </div>
 
-      <button className="btn btn-primary">
-        {initialData ? "Update" : "Submit"}
+      <button className="btn btn-primary" disabled={isSubmitting}>
+        {isSubmitting ? "Processing..." : (initialData ? "Update" : "Submit")}
       </button>
     </form>
   );

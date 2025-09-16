@@ -8,7 +8,8 @@ export async function GET(request) {
     const [totalTenants] = await sql`
       SELECT COUNT(*)
       FROM tenants t
-      JOIN units u ON t.unit_id = u.id
+      JOIN tenants_units tu ON t.id = tu.tenant_id AND tu.occupancy_status = 'active'
+      JOIN units u ON tu.unit_id = u.id
       LEFT JOIN buildings b ON u.building_id = b.id
       WHERE (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
     `;
@@ -17,7 +18,7 @@ export async function GET(request) {
       SELECT COALESCE(SUM(p.amount_paid), 0)
       FROM payments p
       JOIN tenants t ON p.tenant_id = t.id
-      LEFT JOIN units u ON COALESCE(p.unit_id, t.unit_id) = u.id
+      LEFT JOIN units u ON p.unit_id = u.id
       LEFT JOIN buildings b ON u.building_id = b.id
       WHERE DATE_TRUNC('month', p.date_paid) = DATE_TRUNC('month', CURRENT_DATE)
         AND (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
@@ -28,7 +29,7 @@ export async function GET(request) {
       FROM units u
       LEFT JOIN buildings b ON u.building_id = b.id
       WHERE (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
-        AND u.id IN (SELECT unit_id FROM tenants WHERE unit_id IS NOT NULL)
+        AND u.id IN (SELECT unit_id FROM tenants_units WHERE occupancy_status = 'active')
     `;
 
     const [totalMaintenance] = await sql`
@@ -45,7 +46,7 @@ export async function GET(request) {
         SUM(p.amount_paid) AS total
       FROM payments p
       JOIN tenants t ON p.tenant_id = t.id
-      LEFT JOIN units u ON COALESCE(p.unit_id, t.unit_id) = u.id
+      LEFT JOIN units u ON p.unit_id = u.id
       LEFT JOIN buildings b ON u.building_id = b.id
       WHERE (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
       GROUP BY DATE_TRUNC('month', p.date_paid)
@@ -56,8 +57,8 @@ export async function GET(request) {
     const occupancyData = await sql`
       SELECT 
         b.name AS building,
-        COUNT(u.id) FILTER (WHERE u.id IN (SELECT unit_id FROM tenants)) AS occupied,
-        COUNT(u.id) FILTER (WHERE u.id NOT IN (SELECT unit_id FROM tenants WHERE unit_id IS NOT NULL)) AS vacant
+        COUNT(u.id) FILTER (WHERE u.id IN (SELECT unit_id FROM tenants_units WHERE occupancy_status = 'active')) AS occupied,
+        COUNT(u.id) FILTER (WHERE u.id NOT IN (SELECT unit_id FROM tenants_units WHERE occupancy_status = 'active')) AS vacant
       FROM buildings b
       LEFT JOIN units u ON b.id = u.building_id
       WHERE b.owner_id = ${ownerId}

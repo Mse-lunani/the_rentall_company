@@ -12,7 +12,10 @@ export default function PaymentForm() {
   const [tenants, setTenants] = useState([]);
   const [selectedTenant, setSelectedTenant] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentTenancy, setCurrentTenancy] = useState(null);
+  const [activeTenancies, setActiveTenancies] = useState([]);
+  const [selectedTenancyId, setSelectedTenancyId] = useState("");
 
   useEffect(() => {
     fetchTenants();
@@ -30,11 +33,21 @@ export default function PaymentForm() {
       if (res.ok) {
         const data = await res.json();
         const activeTenancies = data.tenancy_history?.filter(t => t.occupancy_status === 'active') || [];
-        setCurrentTenancy(activeTenancies.length > 0 ? activeTenancies[0] : null);
+        setActiveTenancies(activeTenancies);
+
+        if (activeTenancies.length === 1) {
+          setCurrentTenancy(activeTenancies[0]);
+          setSelectedTenancyId(activeTenancies[0].id);
+        } else {
+          setCurrentTenancy(null);
+          setSelectedTenancyId("");
+        }
       }
     } catch (error) {
       console.error("Failed to fetch tenancy info:", error);
       setCurrentTenancy(null);
+      setActiveTenancies([]);
+      setSelectedTenancyId("");
     }
   };
 
@@ -50,12 +63,21 @@ export default function PaymentForm() {
         fetchCurrentTenancy(tenant.id);
       } else {
         setCurrentTenancy(null);
+        setActiveTenancies([]);
+        setSelectedTenancyId("");
       }
+    }
+
+    if (name === "selectedTenancyId") {
+        setSelectedTenancyId(value);
+        const tenancy = activeTenancies.find(t => t.id === parseInt(value));
+        setCurrentTenancy(tenancy || null);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const res = await fetch("/api/payments", {
       method: "POST",
@@ -65,6 +87,8 @@ export default function PaymentForm() {
         amount_paid: parseFloat(form.amount),
         date_paid: form.date,
         notes: form.notes,
+        tenancy_id: selectedTenancyId,
+        unit_id: currentTenancy ? currentTenancy.unit_id : null
       }),
     });
 
@@ -78,9 +102,13 @@ export default function PaymentForm() {
         notes: "",
       });
       setSelectedTenant(null);
+      setActiveTenancies([]);
+      setSelectedTenancyId("");
+      setCurrentTenancy(null);
     } else {
       alert(result.error || "Failed to record payment");
     }
+    setIsSubmitting(false);
   };
 
   const paid = parseFloat(form.amount || 0);
@@ -129,6 +157,27 @@ export default function PaymentForm() {
           ))}
         </select>
       </div>
+
+      {activeTenancies.length > 1 && (
+        <div className="form-group mb-3">
+          <label>Select Tenancy/Unit *</label>
+          <select
+            name="selectedTenancyId"
+            className="form-control"
+            value={selectedTenancyId}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Select a Unit --</option>
+            {activeTenancies.map((tenancy) => (
+              <option key={tenancy.id} value={tenancy.id}>
+                {tenancy.unit_name} ({tenancy.building_name}) - KES {Number(tenancy.monthly_rent).toLocaleString()}/month
+              </option>
+            ))}
+          </select>
+          <small className="text-muted">This tenant has multiple active tenancies. Please select the one you want to record a payment for.</small>
+        </div>
+      )}
 
       {selectedTenant && (
         <div className="mb-2">
@@ -206,8 +255,8 @@ export default function PaymentForm() {
         />
       </div>
 
-      <button className="btn btn-primary" disabled={loading}>
-        Submit Payment
+      <button className="btn btn-primary" disabled={loading || isSubmitting}>
+        {isSubmitting ? 'Submitting...' : 'Submit Payment'}
       </button>
     </form>
   );

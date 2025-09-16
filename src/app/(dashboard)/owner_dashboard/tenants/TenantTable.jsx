@@ -22,22 +22,19 @@ export default function TenantTable({ tenants, onView, onDelete }) {
 
   const getTenancyStatusBadge = (status) => {
     const statusMap = {
-      'HAS_ACTIVE_TENANCY': { class: 'bg-dark text-white', text: 'Active Tenancy' },
-      'LEGACY_ONLY': { class: 'bg-dark text-white', text: 'Legacy Only' },
-      'NO_UNIT': { class: 'bg-dark text-white', text: 'No Unit' }
+      'active': { class: 'bg-success text-white', text: 'Active Tenancy' },
+      'terminated': { class: 'bg-secondary text-white', text: 'Terminated' },
+      'NO_UNIT': { class: 'bg-warning text-dark', text: 'No Unit' }
     };
-    const statusInfo = statusMap[status] || { class: 'bg-dark text-white', text: 'Unknown' };
+    const statusInfo = statusMap[status] || { class: 'bg-secondary text-white', text: 'Unknown' };
     return (
       <span className={`badge ${statusInfo.class}`}>{statusInfo.text}</span>
     );
   };
 
   const getUnitInfo = (tenant) => {
-    // Prefer new tenancy structure, fall back to legacy
-    if (tenant.current_unit_id && tenant.unit_name) {
+    if (tenant.unit_name) {
       return `${tenant.unit_name} (${tenant.building_name || 'N/A'})`;
-    } else if (tenant.legacy_unit_name) {
-      return `${tenant.legacy_unit_name} (${tenant.legacy_building_name || 'N/A'})`;
     }
     return 'No Unit Assigned';
   };
@@ -75,11 +72,11 @@ export default function TenantTable({ tenants, onView, onDelete }) {
                     </small>
                   )}
                 </td>
-                <td>{getTenancyStatusBadge(tenant.tenancy_status)}</td>
+                <td>{getTenancyStatusBadge(tenant.occupancy_status)}</td>
                 <td>
-                  {tenant.tenancy_rent ? (
+                  {tenant.monthly_rent ? (
                     <span className="text-success">
-                      KES {Number(tenant.tenancy_rent).toLocaleString()}
+                      KES {Number(tenant.monthly_rent).toLocaleString()}
                     </span>
                   ) : tenant.rent_amount_kes ? (
                     <span className="text-muted">
@@ -94,7 +91,7 @@ export default function TenantTable({ tenants, onView, onDelete }) {
                 </td>
                 <td>
                   <Link
-                    href={`/dashboard/tenants/${tenant.id}`}
+                    href={`/owner_dashboard/tenants/${tenant.id}`}
                     className="btn btn-primary btn-sm me-1"
                   >
                     Profile
@@ -106,14 +103,14 @@ export default function TenantTable({ tenants, onView, onDelete }) {
                     Details
                   </button>
                   <Link
-                    href={`/dashboard/tenants/edit/${tenant.id}`}
+                    href={`/owner_dashboard/tenants/edit/${tenant.id}`}
                     className="btn btn-warning btn-sm me-1"
                   >
                     Edit
                   </Link>
-                  {tenant.tenancy_status === 'HAS_ACTIVE_TENANCY' && (
+                  {tenant.occupancy_status === 'active' && (
                     <Link
-                      href={`/dashboard/tenancies/tenant/${tenant.id}`}
+                      href={`/owner_dashboard/tenancies/tenant/${tenant.id}`}
                       className="btn btn-success btn-sm me-1"
                     >
                       Tenancy

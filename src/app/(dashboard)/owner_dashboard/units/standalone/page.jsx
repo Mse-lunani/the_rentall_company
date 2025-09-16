@@ -24,9 +24,9 @@ export default function StandaloneUnitsPage() {
   const fetchStandaloneUnits = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/property-records?unit_type=standalone&include_occupied=true");
+      const res = await fetch("/api/owner/units?standalone=true");
       const data = await res.json();
-      setUnits(data.units || []);
+      setUnits(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -40,7 +40,7 @@ export default function StandaloneUnitsPage() {
 
     try {
       setLoading(true);
-      const res = await fetch(`/api/units?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/owner/units?id=${id}`, { method: "DELETE" });
       const result = await res.json();
 
       if (!res.ok) {
@@ -70,10 +70,10 @@ export default function StandaloneUnitsPage() {
               <p className="text-muted mb-0">Units that are not part of any building</p>
             </div>
             <div>
-              <Link href="/dashboard/units" className="btn btn-outline-primary me-2">
+              <Link href="/owner_dashboard/units" className="btn btn-outline-primary me-2">
                 All Units
               </Link>
-              <Link href="/dashboard/property_entry" className="btn btn-primary">
+              <Link href="/owner_dashboard/property_entry" className="btn btn-primary">
                 Add Standalone Unit
               </Link>
             </div>
@@ -122,9 +122,9 @@ export default function StandaloneUnitsPage() {
                         </td>
                         <td>
                           {unit.owner_name ? (
-                            <Link href={`/dashboard/owners/${unit.owner_id}`} className="text-primary">
+                            <span className="text-primary">
                               {unit.owner_name}
-                            </Link>
+                            </span>
                           ) : (
                             <span className="text-muted">Unassigned</span>
                           )}
@@ -141,7 +141,7 @@ export default function StandaloneUnitsPage() {
                         </td>
                         <td>
                           {unit.tenant_name ? (
-                            <Link href={`/dashboard/tenants/${unit.tenant_id}`} className="text-primary">
+                            <Link href={`/owner_dashboard/tenants/${unit.tenant_id}`} className="text-primary">
                               {unit.tenant_name}
                             </Link>
                           ) : (
@@ -150,7 +150,7 @@ export default function StandaloneUnitsPage() {
                         </td>
                         <td>
                           <Link
-                            href={`/dashboard/property_records/units/edit/${unit.id}`}
+                            href={`/owner_dashboard/property_records/units/edit/${unit.id}`}
                             className="btn btn-warning btn-sm me-1"
                           >
                             Edit
@@ -177,7 +177,7 @@ export default function StandaloneUnitsPage() {
                   <p className="text-muted mb-3">
                     You haven't added any standalone units yet. Create your first standalone unit to get started.
                   </p>
-                  <Link href="/dashboard/property_entry" className="btn btn-primary">
+                  <Link href="/owner_dashboard/property_entry" className="btn btn-primary">
                     Add First Standalone Unit
                   </Link>
                 </div>

@@ -118,20 +118,20 @@ export default function Sidebar() {
           <ul className={`menu-sub ${isTenantsOpen ? "d-block" : "d-none"}`}>
             <li
               className={`menu-item ${
-                pathname === "/owner_dashboard/tenants/add" ? "active" : ""
-              }`}
-            >
-              <Link href="/owner_dashboard/tenants/add" className="menu-link">
-                <div data-i18n="Add Tenant">Add Tenant</div>
-              </Link>
-            </li>
-            <li
-              className={`menu-item ${
                 pathname === "/owner_dashboard/tenants" ? "active" : ""
               }`}
             >
               <Link href="/owner_dashboard/tenants" className="menu-link">
                 <div data-i18n="View Tenants">View Tenants</div>
+              </Link>
+            </li>
+            <li
+              className={`menu-item ${
+                pathname === "/owner_dashboard/tenant_assignment" ? "active" : ""
+              }`}
+            >
+              <Link href="/owner_dashboard/tenant_assignment" className="menu-link">
+                <div data-i18n="Tenant Assignment">Tenant Assignment</div>
               </Link>
             </li>
           </ul>

@@ -24,9 +24,9 @@ export default function AllUnitsPage() {
   const fetchAllUnits = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/property-records?unit_type=all&include_occupied=true");
+      const res = await fetch("/api/owner/units");
       const data = await res.json();
-      setUnits(data.units || []);
+      setUnits(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -40,7 +40,7 @@ export default function AllUnitsPage() {
 
     try {
       setLoading(true);
-      const res = await fetch(`/api/units?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/owner/units?id=${id}`, { method: "DELETE" });
       const result = await res.json();
 
       if (!res.ok) {
@@ -70,12 +70,12 @@ export default function AllUnitsPage() {
               <p className="text-muted mb-0">Complete list of all units in the system</p>
             </div>
             <div className="d-flex flex-column flex-sm-row gap-2">
-              <Link href="/dashboard/units/standalone" className="btn btn-outline-primary">
+              <Link href="/owner_dashboard/units/standalone" className="btn btn-outline-primary">
                 <i className="bx bx-building-house me-1"></i>
                 <span className="d-none d-sm-inline">Standalone Units</span>
                 <span className="d-inline d-sm-none">Standalone</span>
               </Link>
-              <Link href="/dashboard/property_entry" className="btn btn-primary">
+              <Link href="/owner_dashboard/property_entry" className="btn btn-primary">
                 <i className="bx bx-plus me-1"></i>
                 <span className="d-none d-sm-inline text-white">Add New Unit</span>
                 <span className="d-inline d-sm-none text-white">Add Unit</span>
@@ -116,8 +116,8 @@ export default function AllUnitsPage() {
                           {unit.building_name === 'Standalone' ? (
                             <span className="badge badge-secondary">Standalone</span>
                           ) : (
-                            <Link 
-                              href={`/dashboard/property_records/buildings/${unit.building_id}`} 
+                            <Link
+                              href={`/owner_dashboard/property_records/buildings/${unit.building_id}`}
                               className="text-primary"
                             >
                               {unit.building_name}
@@ -126,9 +126,9 @@ export default function AllUnitsPage() {
                         </td>
                         <td>
                           {unit.owner_name ? (
-                            <Link href={`/dashboard/owners/${unit.owner_id}`} className="text-primary">
+                            <span className="text-primary">
                               {unit.owner_name}
-                            </Link>
+                            </span>
                           ) : (
                             <span className="text-muted">Unassigned</span>
                           )}
@@ -143,7 +143,7 @@ export default function AllUnitsPage() {
                         </td>
                         <td>
                           {unit.tenant_name ? (
-                            <Link href={`/dashboard/tenants/${unit.tenant_id}`} className="text-primary">
+                            <Link href={`/owner_dashboard/tenants/${unit.tenant_id}`} className="text-primary">
                               {unit.tenant_name}
                             </Link>
                           ) : (
@@ -153,7 +153,7 @@ export default function AllUnitsPage() {
                         <td>
                           <div className="btn-group" role="group">
                             <Link
-                              href={`/dashboard/property_records/units/edit/${unit.id}`}
+                              href={`/owner_dashboard/property_records/units/edit/${unit.id}`}
                               className="btn btn-warning btn-sm"
                               title="Edit Unit"
                             >
@@ -177,7 +177,7 @@ export default function AllUnitsPage() {
               {!loading && units.length === 0 && (
                 <div className="text-center py-4">
                   <p className="text-muted mb-3">No units found.</p>
-                  <Link href="/dashboard/property_entry" className="btn btn-primary">
+                  <Link href="/owner_dashboard/property_entry" className="btn btn-primary">
                     Add First Unit
                   </Link>
                 </div>

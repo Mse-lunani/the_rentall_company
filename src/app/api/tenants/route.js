@@ -106,7 +106,7 @@ export async function GET(req) {
     try {
       // Get all tenants with current tenancy information
       const tenants = await sql`
-        SELECT 
+        SELECT DISTINCT ON (t.id)
           t.id, 
           t.full_name, 
           t.phone, 
@@ -131,7 +131,7 @@ export async function GET(req) {
         LEFT JOIN tenants_units tu ON t.id = tu.tenant_id AND tu.occupancy_status = 'active'
         LEFT JOIN units u ON tu.unit_id = u.id
         LEFT JOIN buildings b ON u.building_id = b.id
-        ORDER BY t.full_name
+        ORDER BY t.id, tu.start_date DESC
       `;
 
       return Response.json(tenants);

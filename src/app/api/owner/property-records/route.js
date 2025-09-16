@@ -24,10 +24,10 @@ export async function GET(req) {
   if (!includeOccupied) {
     if (currentTenantId) {
       whereConditions.push(
-        `(t.unit_id IS NULL OR t.id = ${Number(currentTenantId)})`
+        `(tu.id IS NULL OR tu.tenant_id = ${Number(currentTenantId)})`
       );
     } else {
-      whereConditions.push(`t.unit_id IS NULL`);
+      whereConditions.push(`tu.id IS NULL`);
     }
   }
 
@@ -51,13 +51,14 @@ export async function GET(req) {
       COALESCE(b.name, 'Standalone') AS building_name,
       o.full_name as owner_name,
       o.id as owner_id,
-      CASE WHEN t.unit_id IS NOT NULL THEN true ELSE false END as is_occupied,
+      CASE WHEN tu.id IS NOT NULL THEN true ELSE false END as is_occupied,
       t.full_name as tenant_name,
       t.id as tenant_id
     FROM units u
     LEFT JOIN buildings b ON u.building_id = b.id
     JOIN owners o ON u.owner_id = o.id
-    LEFT JOIN tenants t ON u.id = t.unit_id
+    LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
+    LEFT JOIN tenants t ON tu.tenant_id = t.id
     ${whereClause}
     ORDER BY b.name, u.name
   `;

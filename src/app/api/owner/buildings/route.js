@@ -23,12 +23,12 @@ export async function GET(request) {
                o.full_name as owner_name,
                o.id as owner_id,
                COUNT(u.id) as total_units,
-               COUNT(u.id) FILTER (WHERE t.unit_id IS NOT NULL) as occupied_units,
-               COUNT(u.id) FILTER (WHERE t.unit_id IS NULL) as vacant_units
+               COUNT(u.id) FILTER (WHERE tu.id IS NOT NULL) as occupied_units,
+               COUNT(u.id) FILTER (WHERE tu.id IS NULL) as vacant_units
         FROM buildings b
         JOIN owners o ON b.owner_id = o.id
         LEFT JOIN units u ON b.id = u.building_id
-        LEFT JOIN tenants t ON u.id = t.unit_id
+        LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
         ${whereClause}
         GROUP BY b.id, o.full_name, o.id
       `;
@@ -38,11 +38,12 @@ export async function GET(request) {
       if (includeUnits) {
         const units = await sql`
           SELECT u.*,
-                 CASE WHEN t.unit_id IS NOT NULL THEN true ELSE false END as is_occupied,
+                 CASE WHEN tu.id IS NOT NULL THEN true ELSE false END as is_occupied,
                  t.full_name as tenant_name,
                  t.id as tenant_id
           FROM units u
-          LEFT JOIN tenants t ON u.id = t.unit_id
+          LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
+          LEFT JOIN tenants t ON tu.tenant_id = t.id
           WHERE u.building_id = ${Number(id)}
           ORDER BY u.name
         `;
@@ -66,13 +67,13 @@ export async function GET(request) {
              o.full_name as owner_name,
              o.id as owner_id,
              COUNT(u.id) as total_units,
-             COUNT(u.id) FILTER (WHERE t.unit_id IS NOT NULL) as occupied_units,
-             COUNT(u.id) FILTER (WHERE t.unit_id IS NULL) as vacant_units,
+             COUNT(u.id) FILTER (WHERE tu.id IS NOT NULL) as occupied_units,
+             COUNT(u.id) FILTER (WHERE tu.id IS NULL) as vacant_units,
              COALESCE(SUM(u.rent_amount_kes), 0) as potential_monthly_income
       FROM buildings b
       JOIN owners o ON b.owner_id = o.id
       LEFT JOIN units u ON b.id = u.building_id
-      LEFT JOIN tenants t ON u.id = t.unit_id
+      LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
       ${whereClause}
       GROUP BY b.id, o.full_name, o.id
       ORDER BY b.name

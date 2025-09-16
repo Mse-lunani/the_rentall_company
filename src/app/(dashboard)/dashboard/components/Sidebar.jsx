@@ -128,6 +128,15 @@ export default function Sidebar() {
             </li>
             <li
               className={`menu-item ${
+                pathname === "/dashboard/tenant_assignment" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/tenant_assignment" className="menu-link">
+                <div data-i18n="Assign Tenant">Assign Tenant</div>
+              </Link>
+            </li>
+            <li
+              className={`menu-item ${
                 pathname === "/dashboard/tenants" ? "active" : ""
               }`}
             >

@@ -263,7 +263,7 @@ export default function TenantForm({ initialData = null }) {
             className="mt-3 btn btn-primary"
             disabled={loading || isSubmitting}
           >
-            {initialData ? "Update" : "Submit"}
+            {isSubmitting ? (initialData ? "Updating..." : "Submitting...") : (initialData ? "Update" : "Submit")}
           </button>
         </div>
       </form>

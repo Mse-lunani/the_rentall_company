@@ -5,10 +5,20 @@ import { useState } from "react";
 export default function ProfileForm() {
   const [name, setName] = useState("Michael Se-lunani");
   const [email, setEmail] = useState("admin@example.com");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Profile updated (frontend only)");
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      setTimeout(() => {
+        alert("Profile updated (frontend only)");
+        setIsSubmitting(false);
+      }, 1000);
+    } catch (error) {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -34,8 +44,8 @@ export default function ProfileForm() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <button className="btn btn-primary" type="submit">
-            Save Changes
+          <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
       </div>

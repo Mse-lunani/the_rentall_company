@@ -17,6 +17,7 @@ export default function EditBuildingPage({ params }) {
   });
 
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function fetchBuilding(id) {
@@ -39,6 +40,7 @@ export default function EditBuildingPage({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     console.log("Updating building...", form);
 
     try {
@@ -60,6 +62,8 @@ export default function EditBuildingPage({ params }) {
     } catch (err) {
       console.error("Network or server error:", err);
       alert("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,8 +77,8 @@ export default function EditBuildingPage({ params }) {
           <form onSubmit={handleSubmit}>
             <BuildingForm form={form} setForm={setForm} />
             <div className="card-footer">
-              <button type="submit" className="mt-3 btn btn-primary">
-                Save Changes
+              <button type="submit" className="mt-3 btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </form>

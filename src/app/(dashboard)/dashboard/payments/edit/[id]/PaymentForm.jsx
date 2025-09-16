@@ -13,6 +13,7 @@ export default function PaymentForm({ initialData = null }) {
 
   const [tenants, setTenants] = useState([]);
   const [selectedTenant, setSelectedTenant] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetch("/api/tenants")
@@ -48,6 +49,7 @@ export default function PaymentForm({ initialData = null }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const payload = {
       tenant_id: form.tenantId,
       amount_paid: parseFloat(form.amount),
@@ -73,6 +75,7 @@ export default function PaymentForm({ initialData = null }) {
     } else {
       alert(result.error || "Failed");
     }
+    setIsSubmitting(false);
   };
 
   const paid = parseFloat(form.amount || 0);
@@ -156,8 +159,8 @@ export default function PaymentForm({ initialData = null }) {
         />
       </div>
 
-      <button className="btn btn-primary">
-        {initialData ? "Update" : "Submit"}
+      <button className="btn btn-primary" disabled={isSubmitting}>
+        {isSubmitting ? (initialData ? 'Updating...' : 'Submitting...') : (initialData ? "Update" : "Submit")}
       </button>
     </form>
   );

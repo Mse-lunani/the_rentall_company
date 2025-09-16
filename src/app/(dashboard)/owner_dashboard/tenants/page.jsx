@@ -11,7 +11,7 @@ export default function TenantListPage() {
   const [tenants, setTenants] = useState([]);
   const fetchTenants = async () => {
     try {
-      const res = await fetch("/api/tenants");
+      const res = await fetch("/api/owner/tenants");
       const data = await res.json();
       console.log("Tenants fetched:", data);
       setTenants(data || []);
@@ -29,7 +29,7 @@ export default function TenantListPage() {
     );
     if (!confirm) return;
     // Perform delete request
-    const res = await fetch(`/api/tenants?id=${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/owner/tenants?id=${id}`, { method: "DELETE" });
     const result = await res.json();
     if (!res.ok) {
       alert(result.error || "Delete failed");
@@ -100,22 +100,22 @@ export default function TenantListPage() {
               <div className="btn-group">
                 {selectedTenant.tenancy_status === 'HAS_ACTIVE_TENANCY' && (
                   <>
-                    <Link 
-                      href={`/dashboard/tenancies/tenant/${selectedTenant.id}`}
+                    <Link
+                      href={`/owner_dashboard/tenancies/tenant/${selectedTenant.id}`}
                       className="btn btn-info btn-sm"
                     >
                       View Full History
                     </Link>
-                    <Link 
-                      href={`/dashboard/tenants/${selectedTenant.id}/move`}
+                    <Link
+                      href={`/owner_dashboard/tenants/${selectedTenant.id}/move`}
                       className="btn btn-warning btn-sm"
                     >
                       Move Unit
                     </Link>
                   </>
                 )}
-                <Link 
-                  href={`/dashboard/tenants/edit/${selectedTenant.id}`}
+                <Link
+                  href={`/owner_dashboard/tenants/edit/${selectedTenant.id}`}
                   className="btn btn-primary btn-sm"
                 >
                   Edit Details

@@ -14,6 +14,7 @@ export default function PropertyEntryPage() {
   const router = useRouter();
   const [currentbuildings, setCurrentBuildings] = useState([]);
   const [owners, setOwners] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Fetch owner's buildings
@@ -42,6 +43,7 @@ export default function PropertyEntryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const unitPayload = units.map((u) => u.data);
 
@@ -56,6 +58,7 @@ export default function PropertyEntryPage() {
       const building_id = parseInt(building.building_id);
       if (!building_id) {
         alert("Please select a building.");
+        setIsSubmitting(false);
         return;
       }
 
@@ -70,20 +73,26 @@ export default function PropertyEntryPage() {
       };
     }
 
-    const res = await fetch("/api/owner/property-entry", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch("/api/owner/property-entry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    const result = await res.json();
-    if (result.success) {
-      alert("Property entry successful!");
-      router.push("/owner_dashboard/property_records");
-    } else {
-      alert("Failed to save: " + result.message);
+      const result = await res.json();
+      if (result.success) {
+        alert("Property entry successful!");
+        router.push("/owner_dashboard/property_records");
+      } else {
+        alert("Failed to save: " + result.message);
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+      setIsSubmitting(false);
     }
   };
 
@@ -216,8 +225,8 @@ export default function PropertyEntryPage() {
             </div>
 
             <div className="card-footer">
-              <button type="submit" className="mt-3 btn btn-primary">
-                Submit Property
+              <button type="submit" className="mt-3 btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit Property'}
               </button>
             </div>
           </form>

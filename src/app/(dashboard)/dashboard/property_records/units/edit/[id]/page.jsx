@@ -22,6 +22,7 @@ export default function EditUnitPage({ params }) {
   });
 
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [owners, setOwners] = useState([]);
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function EditUnitPage({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     console.log("Updating unit...", form);
 
     // Prepare form data, converting empty owner_id to null
@@ -83,6 +85,8 @@ export default function EditUnitPage({ params }) {
     } catch (err) {
       console.error("Network or server error:", err);
       alert("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,8 +135,8 @@ export default function EditUnitPage({ params }) {
               removable={false}
             />
             <div className="card-footer">
-              <button type="submit" className="mt-3 btn btn-primary">
-                Save Changes
+              <button type="submit" className="mt-3 btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </form>

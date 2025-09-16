@@ -1,0 +1,142 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+export default function TenantLoginPage() {
+  const [errorType, setErrorType] = useState(null);
+
+  useEffect(() => {
+    // check URL query for error (e.g. ?error=invalid_credentials)
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    if (error) {
+      setErrorType(error);
+    }
+  }, []);
+
+  return (
+    <>
+      <div className="container-xxl">
+        <div className="authentication-wrapper authentication-basic container-p-y">
+          <div className="authentication-inner">
+            <div className="card">
+              <div className="card-body">
+                {/* Logo */}
+                <div className="app-brand justify-content-center">
+                  <a href="#" className="app-brand-link gap-2">
+                    <img
+                      alt="Logo"
+                      src="/assets/img/logo.png"
+                      style={{ width: 150 }}
+                    />
+                  </a>
+                </div>
+                {/* /Logo */}
+
+                <div className="text-center mb-3">
+                  <span className="badge bg-info fs-6 px-3 py-2">Tenant Portal</span>
+                </div>
+                <h4 className="mb-2">Welcome to Your Home 🏠</h4>
+                <p className="mb-4">
+                  Tenant login - Please sign-in to view your tenancy information
+                </p>
+
+                <form
+                  id="formAuthentication"
+                  className="mb-3"
+                  action="/api/auth/tenant/login"
+                  method="POST"
+                >
+                  {errorType && (
+                    <div className="mb-3">
+                      <div className="alert alert-danger" role="alert">
+                        {errorType === 'invalid_credentials' && "Wrong phone number or password"}
+                        {errorType === 'missing_fields' && "Please fill in all fields"}
+                        {errorType === 'server_error' && "We're experiencing server issues. Please try again later."}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mb-3">
+                    <label htmlFor="phone" className="form-label">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      id="phone"
+                      name="phone"
+                      placeholder="Enter your phone number"
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="mb-3 form-password-toggle">
+                    <div className="d-flex justify-content-between">
+                      <label className="form-label" htmlFor="password">
+                        Password
+                      </label>
+                      <a href="#">
+                        <small>Forgot Password?</small>
+                      </a>
+                    </div>
+                    <div className="input-group input-group-merge">
+                      <input
+                        type="password"
+                        id="password"
+                        className="form-control"
+                        name="password"
+                        placeholder="••••••••••••"
+                        aria-describedby="password"
+                      />
+                      <span className="input-group-text cursor-pointer">
+                        <i className="bx bx-hide"></i>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="remember-me"
+                      />
+                      <label className="form-check-label" htmlFor="remember-me">
+                        Remember Me
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <button
+                      className="btn btn-info d-grid w-100"
+                      type="submit"
+                    >
+                      Sign in
+                    </button>
+                  </div>
+                </form>
+
+                <div className="text-center mt-3">
+                  <p className="text-muted">
+                    Are you a property owner?{" "}
+                    <a href="/owner-login" className="text-primary">
+                      Login as Owner
+                    </a>
+                  </p>
+                  <p className="text-muted">
+                    Need admin access?{" "}
+                    <a href="/login" className="text-primary">
+                      Admin Login
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

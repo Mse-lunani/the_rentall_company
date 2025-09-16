@@ -8,6 +8,7 @@ export default function MoveTenantPage({ params }) {
   const [tenant, setTenant] = useState(null);
   const [availableUnits, setAvailableUnits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     new_unit_id: '',
     move_date: new Date().toISOString().split('T')[0],
@@ -52,6 +53,7 @@ export default function MoveTenantPage({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     if (!formData.new_unit_id) {
       alert("Please select a new unit");
@@ -75,6 +77,8 @@ export default function MoveTenantPage({ params }) {
       }
     } catch (err) {
       alert("Failed to move tenant: " + err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -261,8 +265,8 @@ export default function MoveTenantPage({ params }) {
                       <Link href="/dashboard/tenants" className="btn btn-secondary me-2">
                         Cancel
                       </Link>
-                      <button type="submit" className="btn btn-primary">
-                        Move Tenant
+                      <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                        {isSubmitting ? 'Moving...' : 'Move Tenant'}
                       </button>
                     </div>
                   </form>

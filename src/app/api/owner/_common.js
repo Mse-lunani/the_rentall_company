@@ -12,7 +12,10 @@ export function getOwnerIdFromSession() {
 export function requireOwnerIdOr401(request) {
   const ownerId = getOwnerIdFromSession();
   if (!ownerId) {
-    return { error: Response.json({ error: "Unauthorized" }, { status: 401 }), ownerId: null };
+    return {
+      error: Response.json({ error: "Unauthorized" }, { status: 401 }),
+      ownerId: null,
+    };
   }
   return { error: null, ownerId };
 }

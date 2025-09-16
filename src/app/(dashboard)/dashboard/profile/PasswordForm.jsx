@@ -5,14 +5,24 @@ export default function PasswordForm() {
   const [oldPwd, setOldPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newPwd !== confirmPwd) {
-      alert("Passwords do not match");
-      return;
+    setIsSubmitting(true);
+    try {
+      if (newPwd !== confirmPwd) {
+        alert("Passwords do not match");
+        return;
+      }
+      // Simulate API call
+      setTimeout(() => {
+        alert("Password changed (frontend only)");
+        setIsSubmitting(false);
+      }, 1000);
+    } catch (error) {
+      setIsSubmitting(false);
     }
-    alert("Password changed (frontend only)");
   };
 
   return (
@@ -49,8 +59,8 @@ export default function PasswordForm() {
               onChange={(e) => setConfirmPwd(e.target.value)}
             />
           </div>
-          <button className="btn btn-warning" type="submit">
-            Change Password
+          <button className="btn btn-warning" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Changing...' : 'Change Password'}
           </button>
         </form>
       </div>

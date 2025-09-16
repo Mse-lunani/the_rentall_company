@@ -200,7 +200,7 @@ export default function OwnerForm({ initialData = null }) {
             className="mt-3 btn btn-primary"
             disabled={isSubmitting}
           >
-            {initialData ? "Update" : "Submit"}
+            {isSubmitting ? (initialData ? "Updating..." : "Submitting...") : (initialData ? "Update" : "Submit")}
           </button>
         </div>
       </form>

@@ -1,5 +1,6 @@
 import { sql, requireOwnerIdOr401 } from "../_common";
 import { updateRow, deleteRow } from "../../../../lib/db";
+import crypto from "crypto";
 
 export async function GET(request) {
   const { error, ownerId } = requireOwnerIdOr401(request);
@@ -37,10 +38,10 @@ export async function GET(request) {
                tu.deposit_paid,
                tu.occupancy_status
         FROM tenants t
-        LEFT JOIN units u ON t.unit_id = u.id
+        LEFT JOIN tenants_units tu ON t.id = tu.tenant_id AND tu.occupancy_status = 'active'
+        LEFT JOIN units u ON tu.unit_id = u.id
         LEFT JOIN buildings b ON u.building_id = b.id
         LEFT JOIN owners o ON COALESCE(u.owner_id, b.owner_id) = o.id
-        LEFT JOIN tenants_units tu ON t.id = tu.tenant_id AND u.id = tu.unit_id AND tu.occupancy_status = 'active'
         ${whereClause}
       `;
 
@@ -78,11 +79,11 @@ export async function GET(request) {
     }
 
     // Build dynamic WHERE conditions for listing
-    let whereConditions = [`(u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})`];
-    
-    if (active) {
-      whereConditions.push(`tu.occupancy_status = 'active'`);
-    }
+    // Always require active tenancy and owner ownership
+    let whereConditions = [
+      `(u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})`,
+      `tu.occupancy_status = 'active'`
+    ];
 
     if (buildingId) {
       whereConditions.push(`b.id = ${Number(buildingId)}`);
@@ -106,13 +107,13 @@ export async function GET(request) {
              COALESCE(SUM(p.amount_paid), 0) as total_payments,
              MAX(p.date_paid) as last_payment_date
       FROM tenants t
-      LEFT JOIN units u ON t.unit_id = u.id
+      INNER JOIN tenants_units tu ON t.id = tu.tenant_id
+      INNER JOIN units u ON tu.unit_id = u.id
       LEFT JOIN buildings b ON u.building_id = b.id
       LEFT JOIN owners o ON COALESCE(u.owner_id, b.owner_id) = o.id
-      LEFT JOIN tenants_units tu ON t.id = tu.tenant_id AND u.id = tu.unit_id
       LEFT JOIN payments p ON tu.id = p.tenancy_id
       ${whereClause}
-      GROUP BY t.id, u.id, u.name, u.rent_amount_kes, b.id, b.name, o.full_name, 
+      GROUP BY t.id, u.id, u.name, u.rent_amount_kes, b.id, b.name, o.full_name,
                tu.start_date, tu.monthly_rent, tu.deposit_paid, tu.occupancy_status
       ORDER BY t.full_name
     `;
@@ -120,6 +121,57 @@ export async function GET(request) {
     return Response.json(tenants);
   } catch (err) {
     console.error("GET /api/owner/tenants error:", err);
+    return Response.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(request) {
+  const { error, ownerId } = requireOwnerIdOr401(request);
+  if (error) return error;
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id || isNaN(id)) {
+    return Response.json({ error: "Invalid tenant ID" }, { status: 400 });
+  }
+
+  try {
+    // Verify ownership
+    const [existing] = await sql`
+      SELECT t.id
+      FROM tenants t
+      LEFT JOIN tenants_units tu ON t.id = tu.tenant_id
+      LEFT JOIN units u ON tu.unit_id = u.id
+      LEFT JOIN buildings b ON u.building_id = b.id
+      WHERE t.id = ${Number(id)} AND (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
+    `;
+
+    if (!existing) {
+      return Response.json({ error: "Tenant not found or not owned by this owner" }, { status: 403 });
+    }
+
+    const data = await request.json();
+
+    if (data.regenerate_password) {
+      // Generate new password
+      const randomPassword = Math.floor(Math.random() * 9000) + 1000;
+      const passwordHash = crypto.createHash("md5").update(randomPassword.toString()).digest("hex");
+
+      await updateRow("tenants", {
+        password: passwordHash,
+        password_text: randomPassword.toString()
+      }, { id: Number(id) });
+
+      return Response.json({
+        success: true,
+        password: randomPassword.toString()
+      });
+    }
+
+    return Response.json({ error: "No valid operation specified" }, { status: 400 });
+  } catch (err) {
+    console.error("PATCH /api/owner/tenants error:", err);
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -140,7 +192,8 @@ export async function PUT(request) {
     const [existing] = await sql`
       SELECT t.id
       FROM tenants t
-      LEFT JOIN units u ON t.unit_id = u.id
+      LEFT JOIN tenants_units tu ON t.id = tu.tenant_id
+      LEFT JOIN units u ON tu.unit_id = u.id
       LEFT JOIN buildings b ON u.building_id = b.id
       WHERE t.id = ${Number(id)} AND (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
     `;
@@ -175,7 +228,8 @@ export async function DELETE(request) {
     const [existing] = await sql`
       SELECT t.id
       FROM tenants t
-      LEFT JOIN units u ON t.unit_id = u.id
+      LEFT JOIN tenants_units tu ON t.id = tu.tenant_id
+      LEFT JOIN units u ON tu.unit_id = u.id
       LEFT JOIN buildings b ON u.building_id = b.id
       WHERE t.id = ${Number(id)} AND (u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})
     `;

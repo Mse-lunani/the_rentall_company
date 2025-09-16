@@ -19,7 +19,7 @@ export default function PaymentsPage() {
   const fetchPayments = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/payments");
+      const res = await fetch("/api/owner/payments");
       const data = await res.json();
       setPayments(data || []);
     } catch (error) {
@@ -39,7 +39,7 @@ export default function PaymentsPage() {
         <div className="container-xxl flex-grow-1 container-p-y">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h4>Tenant Payments</h4>
-            <Link href="/dashboard/payments/add" className="btn btn-primary">
+            <Link href="/owner_dashboard/payments/add" className="btn btn-primary">
               + Record Payment
             </Link>
           </div>
@@ -104,7 +104,7 @@ export default function PaymentsPage() {
                         <td>
                           <div className="btn-group" role="group">
                             <Link
-                              href={`/dashboard/payments/edit/${p.id}`}
+                              href={`/owner_dashboard/payments/edit/${p.id}`}
                               className="btn btn-warning btn-sm"
                               title="Edit Payment"
                             >

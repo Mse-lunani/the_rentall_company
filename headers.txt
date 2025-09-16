@@ -1,0 +1,9 @@
+HTTP/1.1 302 Found
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+location: http://localhost:3000/owner_dashboard
+set-cookie: owner_session=1; Path=/; Expires=Tue, 16 Sep 2025 08:29:32 GMT; Max-Age=86400; HttpOnly; SameSite=lax
+Date: Mon, 15 Sep 2025 08:29:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+

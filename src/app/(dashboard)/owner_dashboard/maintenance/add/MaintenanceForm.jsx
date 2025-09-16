@@ -9,6 +9,7 @@ export default function MaintenanceForm() {
     notes: "",
     image: null,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -19,9 +20,17 @@ export default function MaintenanceForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     console.log("Maintenance Record:", form);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    alert("Maintenance record saved!");
+    setIsSubmitting(false);
   };
 
   return (
@@ -83,8 +92,8 @@ export default function MaintenanceForm() {
         />
       </div>
 
-      <button type="submit" className="btn btn-primary">
-        Save Maintenance Record
+      <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+        {isSubmitting ? 'Saving...' : 'Save Maintenance Record'}
       </button>
     </form>
   );

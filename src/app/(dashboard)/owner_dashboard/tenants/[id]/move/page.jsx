@@ -8,6 +8,7 @@ export default function MoveTenantPage({ params }) {
   const [tenant, setTenant] = useState(null);
   const [availableUnits, setAvailableUnits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     new_unit_id: '',
     move_date: new Date().toISOString().split('T')[0],
@@ -24,15 +25,15 @@ export default function MoveTenantPage({ params }) {
 
       try {
         // Fetch tenant details
-        const tenantRes = await fetch(`/api/tenants?id=${tenantId}&include_history=true`);
+        const tenantRes = await fetch(`/api/owner/tenants?id=${tenantId}&include_history=true`);
         const tenantData = await tenantRes.json();
-        
+
         if (tenantRes.ok) {
           setTenant(tenantData);
         }
 
         // Fetch available units
-        const unitsRes = await fetch('/api/units');
+        const unitsRes = await fetch('/api/owner/units');
         const unitsData = await unitsRes.json();
         
         if (unitsRes.ok) {
@@ -52,14 +53,16 @@ export default function MoveTenantPage({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setIsSubmitting(true);
+
     if (!formData.new_unit_id) {
       alert("Please select a new unit");
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      const res = await fetch(`/api/tenants/${tenant.id}/move`, {
+      const res = await fetch(`/api/owner/tenants/${tenant.id}/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -69,12 +72,14 @@ export default function MoveTenantPage({ params }) {
 
       if (res.ok) {
         alert("Tenant moved successfully!");
-        router.push(`/dashboard/tenancies/tenant/${tenant.id}`);
+        router.push(`/owner_dashboard/tenancies/tenant/${tenant.id}`);
       } else {
         alert("Failed to move tenant: " + result.error);
+        setIsSubmitting(false);
       }
     } catch (err) {
       alert("Failed to move tenant: " + err.message);
+      setIsSubmitting(false);
     }
   };
 
@@ -259,11 +264,11 @@ export default function MoveTenantPage({ params }) {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                      <Link href="/dashboard/tenants" className="btn btn-secondary me-2">
+                      <Link href="/owner_dashboard/tenants" className="btn btn-secondary me-2">
                         Cancel
                       </Link>
-                      <button type="submit" className="btn btn-primary">
-                        Move Tenant
+                      <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                        {isSubmitting ? 'Moving...' : 'Move Tenant'}
                       </button>
                     </div>
                   </form>

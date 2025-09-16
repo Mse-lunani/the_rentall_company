@@ -14,6 +14,7 @@ export default function PropertyEntryPage() {
   const router = useRouter();
   const [currentbuildings, setCurrentBuildings] = useState([]);
   const [owners, setOwners] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Fetch buildings
@@ -50,6 +51,7 @@ export default function PropertyEntryPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const unitPayload = units.map((u) => u.data);
 
@@ -98,6 +100,7 @@ export default function PropertyEntryPage() {
     } else {
       alert("Failed to save: " + result.message);
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -258,8 +261,8 @@ export default function PropertyEntryPage() {
             </div>
 
             <div className="card-footer">
-              <button type="submit" className="mt-3 btn btn-primary">
-                Submit Property
+              <button type="submit" className="mt-3 btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit Property'}
               </button>
             </div>
           </form>

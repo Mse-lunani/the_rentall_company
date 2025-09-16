@@ -28,16 +28,19 @@ export async function POST(req) {
     };
 
     if (!tenancy_id || !unit_id) {
-      const [currentTenancy] = await sql`
+      const activeTenancies = await sql`
         SELECT tu.id as tenancy_id, tu.unit_id
         FROM tenants_units tu
         WHERE tu.tenant_id = ${tenant_id} AND tu.occupancy_status = 'active'
-        LIMIT 1
       `;
 
-      if (currentTenancy) {
-        paymentData.tenancy_id = tenancy_id || currentTenancy.tenancy_id;
-        paymentData.unit_id = unit_id || currentTenancy.unit_id;
+      if (activeTenancies.length > 1) {
+        return Response.json({ error: "Tenant has multiple active tenancies. Please specify which unit to pay for." }, { status: 400 });
+      }
+
+      if (activeTenancies.length === 1) {
+        paymentData.tenancy_id = activeTenancies[0].tenancy_id;
+        paymentData.unit_id = activeTenancies[0].unit_id;
       }
     }
 

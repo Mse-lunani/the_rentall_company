@@ -29,7 +29,7 @@ export async function GET(request) {
                b.id as building_id,
                o.full_name as owner_name,
                o.id as owner_id,
-               CASE WHEN t.unit_id IS NOT NULL THEN true ELSE false END as is_occupied,
+               CASE WHEN tu.id IS NOT NULL THEN true ELSE false END as is_occupied,
                t.full_name as tenant_name,
                t.id as tenant_id,
                t.phone as tenant_phone,
@@ -37,7 +37,8 @@ export async function GET(request) {
         FROM units u
         LEFT JOIN buildings b ON u.building_id = b.id
         LEFT JOIN owners o ON COALESCE(u.owner_id, b.owner_id) = o.id
-        LEFT JOIN tenants t ON u.id = t.unit_id
+        LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
+        LEFT JOIN tenants t ON tu.tenant_id = t.id
         ${whereClause}
       `;
 
@@ -73,7 +74,7 @@ export async function GET(request) {
     let whereConditions = [`(u.owner_id = ${ownerId} OR b.owner_id = ${ownerId})`];
     
     if (available) {
-      whereConditions.push(`t.unit_id IS NULL`);
+      whereConditions.push(`tu.id IS NULL`);
     }
 
     if (standalone) {
@@ -92,14 +93,15 @@ export async function GET(request) {
              b.id as building_id,
              o.full_name as owner_name,
              o.id as owner_id,
-             CASE WHEN t.unit_id IS NOT NULL THEN true ELSE false END as is_occupied,
+             CASE WHEN tu.id IS NOT NULL THEN true ELSE false END as is_occupied,
              t.full_name as tenant_name,
              t.id as tenant_id,
              t.phone as tenant_phone
       FROM units u
       LEFT JOIN buildings b ON u.building_id = b.id
       LEFT JOIN owners o ON COALESCE(u.owner_id, b.owner_id) = o.id
-      LEFT JOIN tenants t ON u.id = t.unit_id
+      LEFT JOIN tenants_units tu ON u.id = tu.unit_id AND tu.occupancy_status = 'active'
+      LEFT JOIN tenants t ON tu.tenant_id = t.id
       ${whereClause}
       ORDER BY COALESCE(b.name, 'Standalone'), u.name
     `;
@@ -171,7 +173,7 @@ export async function DELETE(request) {
 
     // Check if unit has active tenant
     const [tenant] = await sql`
-      SELECT id FROM tenants WHERE unit_id = ${Number(id)}
+      SELECT id FROM tenants_units WHERE unit_id = ${Number(id)} AND occupancy_status = 'active'
     `;
 
     if (tenant) {

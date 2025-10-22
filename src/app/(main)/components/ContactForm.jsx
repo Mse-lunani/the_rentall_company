@@ -46,7 +46,7 @@ export default function Contact() {
         <div className="contact-main-wrapper">
           <div className="map-wrapper">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.806638663275!2d36.78050077563022!3d-1.2903044356318942!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10a74508e065%3A0xa5cbc5deae5472db!2sWu%20Yi%20plaza!5e0!3m2!1sen!2ske!4v1761141886711!5m2!1sen!2ske"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -66,17 +66,17 @@ export default function Contact() {
                 {
                   icon: <FaMapMarkerAlt />,
                   title: "Location",
-                  text: "8721 Broadway Avenue, New York, NY 10023",
+                  text: "Wu Yi Plaza, Galana Road, Nairobi, Kenya",
                 },
                 {
                   icon: <FaEnvelope />,
                   title: "Email",
-                  text: "info@examplecompany.com",
+                  text: "info@therentallcompany.com",
                 },
                 {
                   icon: <FaPhoneAlt />,
                   title: "Call",
-                  text: "+1 (212) 555-7890",
+                  text: "+254 723 052 500",
                 },
                 {
                   icon: <FaClock />,
@@ -109,7 +109,7 @@ export default function Contact() {
                       type="text"
                       name="name"
                       className="form-control"
-                      placeholder="Your Name"
+                      placeholder="Your Name+1 (212) 555-7890"
                       required
                       value={formData.name}
                       onChange={(e) =>

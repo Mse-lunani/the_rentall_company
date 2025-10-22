@@ -13,7 +13,7 @@ export default function AuthLayout({ children }) {
 
         <title>Rentall Portal</title>
         <meta name="description" content="KenyanNurse Login Portal" />
-        <link rel="icon" href="/assets/img/favicon/favicon.ico" />
+        <link rel="icon" href="/assets/img/favicon.png" />
 
         {/* ─── Fonts ─────────────────────────────────────────────── */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

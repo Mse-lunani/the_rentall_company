@@ -43,7 +43,22 @@ export default function About() {
                 of real-estate know-how and cutting-edge technology. Our
                 founding team—seasoned landlords, property managers, and
                 engineers—came together with a shared vision: to remove the
-                friction and headaches that come with running rental properties.
+                friction and headaches that come with running rental
+                properties.We are a data-centric technological
+                company,redefining real estate management through technology,
+                transparency, and trust.We believe that property ownership,
+                leasing, and tenant management should be seamless, efficient,
+                and empowering for everyone involved. As a forward-thinking real
+                estate management company, we leverage innovation to simplify
+                how property owners, tenants, and administrators interact —
+                creating an ecosystem where every stakeholder thrives.
+              </p>
+              <p>
+                Our foundation is built on integrity, efficiency, and customer
+                satisfaction. Whether it’s managing residential apartments,
+                commercial spaces, or multi-unit properties, The Rentall Company
+                stands for smart, data-driven real estate management that
+                transforms everyday living into an elevated experience.
               </p>
             </div>
           </div>
@@ -65,12 +80,36 @@ export default function About() {
 
           <div className="row justify-content-between align-items-center mb-5">
             <div className="col-md-5" data-aos="fade-up" data-aos-delay="100">
-              <p style={{ textAlign: "right" }}>
-                At Rentall, we deliver a comprehensive, cloud-based platform
-                that unifies every facet of property management into one
-                intuitive interface. We automate rent collections with secure
-                online payments and reminders.
+              <p style={{ textAlign: "left" }}>
+                The Rentall Company provides an all-in-one platform that
+                streamlines property management — connecting property owners,
+                and tenants through a secure and intuitive digital experience.
+                We help property owners manage listings, track payments, and
+                monitor performance effortlessly, while giving tenants a
+                convenient way to pay rent, request maintenance, and communicate
+                with their landlords.
               </p>
+              <p style={{ textAlign: "left" }}>
+                Our comprehensive solutions include:
+              </p>
+              <ul style={{ textAlign: "left" }}>
+                <li>
+                  Digital Property Management: End-to-end automation of property
+                  listings, occupancy, and rent collection analytics
+                </li>
+                <li>
+                  Tenant & Lease Management: Simplified tools for onboarding,
+                  tracking leases, and ensuring compliance.
+                </li>
+                <li>
+                  Analytics & Reporting: Real-time insights that empower smarter
+                  decisions for owners and managers.
+                </li>
+                <li>
+                  Maintenance Coordination: Streamlined requests and vendor
+                  management to ensure property quality.
+                </li>
+              </ul>
             </div>
             <div className="col-md-6" data-aos="fade-up" data-aos-delay="200">
               <Image

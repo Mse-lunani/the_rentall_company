@@ -19,13 +19,21 @@ export default function Footer() {
               />
             </Link>
             <div className="footer-contact pt-3">
-              <p>A108 Adam Street</p>
-              <p>New York, NY 535022</p>
+              <p>Wu Yi Plaza, Galana Road</p>
+              <p>Nairobi, Kenya</p>
               <p className="mt-3">
-                <strong>Phone:</strong> <span>+1 5589 55488 55</span>
+                <strong>Call:</strong>{" "}
+                <a href="tel:+254723052500">+254 723 052 500</a>
               </p>
               <p>
-                <strong>Email:</strong> <span>info@example.com</span>
+                <strong>Email:</strong>{" "}
+                <a href="mailto:info@therentallcompany.co.ke">
+                  info@therentallcompany.co.ke
+                </a>
+              </p>
+              <p>
+                <strong>Open Hours:</strong>{" "}
+                <span>Monday-Friday: 9AM - 6PM</span>
               </p>
             </div>
             <div className="social-links d-flex mt-4">
@@ -45,7 +53,7 @@ export default function Footer() {
           </div>
 
           {/* Column 2: Useful Links */}
-          <div className="col-lg-2 col-md-3 footer-links">
+          <div className="col-lg-4 col-md-4 footer-links">
             <h4>Useful Links</h4>
             <ul>
               <li>
@@ -67,61 +75,23 @@ export default function Footer() {
           </div>
 
           {/* Column 3: Our Services */}
-          <div className="col-lg-2 col-md-3 footer-links">
+          <div className="col-lg-4 col-md-4 footer-links">
             <h4>Our Services</h4>
             <ul>
               <li>
-                <Link href="#">Web Design</Link>
+                <Link href="#">Digital Property Management</Link>
               </li>
               <li>
-                <Link href="#">Web Development</Link>
+                <Link href="#">Tenant & Lease Management</Link>
               </li>
               <li>
-                <Link href="#">Product Management</Link>
+                <Link href="#">Analytics & Reporting</Link>
               </li>
               <li>
-                <Link href="#">Marketing</Link>
-              </li>
-              <li>
-                <Link href="#">Graphic Design</Link>
+                <Link href="#">Maintenance Coordination</Link>
               </li>
             </ul>
           </div>
-
-          {/* Columns 4 & 5: Additional Links */}
-          {[
-            {
-              title: "Hic solutasetp",
-              links: [
-                "Molestiae accusamus iure",
-                "Excepturi dignissimos",
-                "Suscipit distinctio",
-                "Dilecta",
-                "Sit quas consectetur",
-              ],
-            },
-            {
-              title: "Nobis illum",
-              links: [
-                "Ipsam",
-                "Laudantium dolorum",
-                "Dinera",
-                "Trodelas",
-                "Flexo",
-              ],
-            },
-          ].map((column, index) => (
-            <div key={index} className="col-lg-2 col-md-3 footer-links">
-              <h4>{column.title}</h4>
-              <ul>
-                {column.links.map((link, i) => (
-                  <li key={i}>
-                    <Link href="#">{link}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
         </div>
       </div>
 

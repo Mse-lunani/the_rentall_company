@@ -1,0 +1,4 @@
+full_name,phone,email,unit_name,start_date,monthly_rent,deposit_paid,lease_terms,notes
+John Doe,+254712345678,john.doe@example.com,Unit A1,2025-02-01,15000,30000,12-month lease with 2-month notice period,Corporate tenant
+Jane Smith,+254723456789,jane.smith@example.com,Unit B2,2025-02-15,18000,36000,Month-to-month lease,Prefers ground floor
+Michael Johnson,+254734567890,,Unit C3,2025-03-01,20000,40000,6-month lease renewable,Student tenant

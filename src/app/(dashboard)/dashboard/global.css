@@ -116,3 +116,21 @@
 .view-more:hover {
   text-decoration: underline;
 }
+
+/* Menu Toggle Chevron Styles */
+.menu-toggle-icon {
+  margin-left: 0.75rem !important;
+  transition: transform 0.3s ease !important;
+  font-size: 1rem;
+  display: inline-block;
+}
+
+.menu-toggle-icon.rotate-down {
+  transform: rotate(90deg) !important;
+}
+
+/* Ensure menu-link has proper flexbox alignment */
+.menu-item.menu-toggle > .menu-link {
+  display: flex !important;
+  align-items: center !important;
+}

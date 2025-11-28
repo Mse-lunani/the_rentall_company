@@ -30,10 +30,27 @@ export async function insertRow(table, data, returnCol = null) {
 
   console.log("Query:", query);
   console.log("Values:", values);
-
-  const result = await sql.query(query, values);
-
-  return returnCol ? result[0] : true;
+  try {
+    const result = await sql.query(query, values);
+    return returnCol ? result[0] : true;
+  } catch (err) {
+    // Provide a clearer diagnostic for connection issues (hide full URL)
+    try {
+      const dbUrl =
+        process.env.DATABASE_URL || process.env.POSTGRES_URL || "(no db url)";
+      let host = dbUrl;
+      try {
+        host = new URL(dbUrl).host;
+      } catch (e) {
+        // keep raw
+      }
+      console.error(`Database query failed connecting to host: ${host}`);
+    } catch (e) {
+      // ignore
+    }
+    console.error("Detailed error:", err);
+    throw err;
+  }
 }
 export async function getRows(table) {
   if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(table)) {

@@ -58,36 +58,89 @@ export default function TenantListPage() {
             <div className="row">
               <div className="col-md-6">
                 <h6 className="text-primary">Personal Information</h6>
-                <p><strong>Full Name:</strong> {selectedTenant.full_name}</p>
-                <p><strong>Phone:</strong> {selectedTenant.phone}</p>
-                <p><strong>Email:</strong> {selectedTenant.email || "N/A"}</p>
-                <p><strong>Created:</strong> {selectedTenant.created_at ? new Date(selectedTenant.created_at).toLocaleDateString() : 'N/A'}</p>
+                <p>
+                  <strong>Full Name:</strong> {selectedTenant.full_name}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {selectedTenant.phone}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedTenant.email || "N/A"}
+                </p>
+                <p>
+                  <strong>Created:</strong>{" "}
+                  {selectedTenant.created_at
+                    ? new Date(selectedTenant.created_at).toLocaleDateString()
+                    : "N/A"}
+                </p>
               </div>
               <div className="col-md-6">
                 <h6 className="text-primary">Current Tenancy</h6>
-                {selectedTenant.tenancy_status === 'HAS_ACTIVE_TENANCY' ? (
+                {selectedTenant.tenancy_status === "HAS_ACTIVE_TENANCY" ? (
                   <>
-                    <p><strong>Unit:</strong> {selectedTenant.unit_name}</p>
-                    <p><strong>Building:</strong> {selectedTenant.building_name}</p>
-                    <p><strong>Monthly Rent:</strong> KES {selectedTenant.tenancy_rent ? Number(selectedTenant.tenancy_rent).toLocaleString() : 'N/A'}</p>
-                    <p><strong>Start Date:</strong> {selectedTenant.start_date ? new Date(selectedTenant.start_date).toLocaleDateString() : 'N/A'}</p>
-                    <p><strong>Duration:</strong> {selectedTenant.start_date ? Math.floor((Date.now() - new Date(selectedTenant.start_date)) / (1000 * 60 * 60 * 24)) : 0} days</p>
+                    <p>
+                      <strong>Unit:</strong> {selectedTenant.unit_name}
+                    </p>
+                    <p>
+                      <strong>Building:</strong> {selectedTenant.building_name}
+                    </p>
+                    <p>
+                      <strong>Monthly Rent:</strong> KES{" "}
+                      {selectedTenant.tenancy_rent
+                        ? Number(selectedTenant.tenancy_rent).toLocaleString()
+                        : "N/A"}
+                    </p>
+                    <p>
+                      <strong>Start Date:</strong>{" "}
+                      {selectedTenant.start_date
+                        ? new Date(
+                            selectedTenant.start_date
+                          ).toLocaleDateString()
+                        : "N/A"}
+                    </p>
+                    <p>
+                      <strong>Duration:</strong>{" "}
+                      {selectedTenant.start_date
+                        ? Math.floor(
+                            (Date.now() - new Date(selectedTenant.start_date)) /
+                              (1000 * 60 * 60 * 24)
+                          )
+                        : 0}{" "}
+                      days
+                    </p>
                     {selectedTenant.deposit_paid && (
-                      <p><strong>Deposit:</strong> KES {Number(selectedTenant.deposit_paid).toLocaleString()}</p>
+                      <p>
+                        <strong>Deposit:</strong> KES{" "}
+                        {Number(selectedTenant.deposit_paid).toLocaleString()}
+                      </p>
                     )}
                   </>
-                ) : selectedTenant.tenancy_status === 'LEGACY_ONLY' ? (
+                ) : selectedTenant.tenancy_status === "LEGACY_ONLY" ? (
                   <>
-                    <p><strong>Unit (Legacy):</strong> {selectedTenant.legacy_unit_name}</p>
-                    <p><strong>Building (Legacy):</strong> {selectedTenant.legacy_building_name}</p>
-                    <p><strong>Status:</strong> <span className="badge badge-warning">Legacy System</span></p>
+                    <p>
+                      <strong>Unit (Legacy):</strong>{" "}
+                      {selectedTenant.legacy_unit_name}
+                    </p>
+                    <p>
+                      <strong>Building (Legacy):</strong>{" "}
+                      {selectedTenant.legacy_building_name}
+                    </p>
+                    <p>
+                      <strong>Status:</strong>{" "}
+                      <span className="badge badge-warning">Legacy System</span>
+                    </p>
                   </>
                 ) : (
-                  <p><strong>Status:</strong> <span className="badge badge-danger">No Active Tenancy</span></p>
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <span className="badge badge-danger">
+                      No Active Tenancy
+                    </span>
+                  </p>
                 )}
               </div>
             </div>
-            
+
             {selectedTenant.tenancy_notes && (
               <div className="mt-3">
                 <h6 className="text-primary">Notes</h6>
@@ -98,25 +151,23 @@ export default function TenantListPage() {
             <div className="mt-3">
               <h6 className="text-primary">Actions</h6>
               <div className="btn-group">
-                {selectedTenant.tenancy_status === 'HAS_ACTIVE_TENANCY' && (
-                  <>
-                    <Link 
-                      href={`/dashboard/tenancies/tenant/${selectedTenant.id}`}
-                      className="btn btn-info btn-sm"
-                    >
-                      View Full History
-                    </Link>
-                    <Link 
-                      href={`/dashboard/tenants/${selectedTenant.id}/move`}
-                      className="btn btn-warning btn-sm"
-                    >
-                      Move Unit
-                    </Link>
-                  </>
-                )}
-                <Link 
-                  href={`/dashboard/tenants/edit/${selectedTenant.id}`}
+                <Link
+                  href={`/dashboard/tenants/${selectedTenant.id}`}
                   className="btn btn-primary btn-sm"
+                >
+                  View Full Profile
+                </Link>
+                {selectedTenant.tenancy_status === "HAS_ACTIVE_TENANCY" && (
+                  <Link
+                    href={`/dashboard/tenants/${selectedTenant.id}/move`}
+                    className="btn btn-warning btn-sm"
+                  >
+                    Move Unit
+                  </Link>
+                )}
+                <Link
+                  href={`/dashboard/tenants/edit/${selectedTenant.id}`}
+                  className="btn btn-info btn-sm"
                 >
                   Edit Details
                 </Link>

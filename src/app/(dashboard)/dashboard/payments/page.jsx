@@ -47,15 +47,17 @@ export default function PaymentsPage() {
           <div className="card">
             <div className="card-body">
               <div className="table-responsive">
-                <table className="table table-bordered table-striped datatables-basic" data-name="Payment Records">
+                <table
+                  className="table table-bordered table-striped datatables-basic"
+                  data-name="Payment Records"
+                >
                   <thead>
                     <tr>
-                      <th style={{width: '15px'}}></th>
+                      <th style={{ width: "15px" }}></th>
                       <th>Tenant</th>
                       <th>Unit</th>
                       <th>Amount (Ksh)</th>
                       <th>Date</th>
-                      <th>Tracking Status</th>
                       <th>Notes</th>
                       <th>Actions</th>
                     </tr>
@@ -66,33 +68,32 @@ export default function PaymentsPage() {
                         <td></td>
                         <td>
                           <strong>{p.full_name}</strong>
-                          {p.phone && <><br/><small className="text-muted">{p.phone}</small></>}
+                          {p.phone && (
+                            <>
+                              <br />
+                              <small className="text-muted">{p.phone}</small>
+                            </>
+                          )}
                         </td>
                         <td>
                           {p.unit_name ? (
                             <div>
                               <strong>{p.unit_name}</strong>
-                              <br/>
-                              <small className="text-muted">{p.building_name}</small>
+                              <br />
+                              <small className="text-muted">
+                                {p.building_name}
+                              </small>
                             </div>
                           ) : (
                             <span className="text-muted">No Unit Info</span>
                           )}
                         </td>
-                        <td><strong>Ksh {p.amount_paid?.toLocaleString()}</strong></td>
-                        <td>{new Date(p.date_paid).toLocaleDateString()}</td>
                         <td>
-                          {p.payment_tracking_status === 'LINKED_TO_TENANCY' && (
-                            <span className="badge bg-success text-white">Tenancy Linked</span>
-                          )}
-                          {p.payment_tracking_status === 'LINKED_TO_UNIT' && (
-                            <span className="badge bg-info text-white">Unit Only</span>
-                          )}
-                          {p.payment_tracking_status === 'NO_LINK' && (
-                            <span className="badge bg-warning text-dark">No Link</span>
-                          )}
+                          <strong>Ksh {p.amount_paid?.toLocaleString()}</strong>
                         </td>
-                        <td>{p.notes || '-'}</td>
+                        <td>{new Date(p.date_paid).toLocaleDateString()}</td>
+
+                        <td>{p.notes || "-"}</td>
                         <td>
                           <div className="btn-group" role="group">
                             <Link
@@ -113,13 +114,6 @@ export default function PaymentsPage() {
                         </td>
                       </tr>
                     ))}
-                    {payments.length === 0 && (
-                      <tr>
-                        <td colSpan="8" className="text-center text-muted">
-                          No payments recorded yet.
-                        </td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>

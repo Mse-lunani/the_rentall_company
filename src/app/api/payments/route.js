@@ -3,13 +3,14 @@ import { neon } from "@neondatabase/serverless";
 const sql = neon(process.env.DATABASE_URL);
 export async function POST(req) {
   const body = await req.json();
-  const { 
-    tenant_id, 
-    amount_paid, 
-    date_paid, 
+  const {
+    tenant_id,
+    amount_paid,
+    date_paid,
     notes,
     tenancy_id,
-    unit_id
+    unit_id,
+    payment_type_id,
   } = body;
 
   if (!tenant_id || !amount_paid || !date_paid) {
@@ -24,7 +25,8 @@ export async function POST(req) {
       date_paid,
       notes,
       tenancy_id,
-      unit_id
+      unit_id,
+      payment_type_id: payment_type_id ?? null,
     };
 
     if (!tenancy_id || !unit_id) {
@@ -35,7 +37,13 @@ export async function POST(req) {
       `;
 
       if (activeTenancies.length > 1) {
-        return Response.json({ error: "Tenant has multiple active tenancies. Please specify which unit to pay for." }, { status: 400 });
+        return Response.json(
+          {
+            error:
+              "Tenant has multiple active tenancies. Please specify which unit to pay for.",
+          },
+          { status: 400 }
+        );
       }
 
       if (activeTenancies.length === 1) {
@@ -48,23 +56,26 @@ export async function POST(req) {
     const [payment] = await sql`
       INSERT INTO payments (
         tenant_id, amount_paid, date_paid, notes, tenancy_id, unit_id
+        , payment_type_id
       ) VALUES (
         ${paymentData.tenant_id},
         ${paymentData.amount_paid},
         ${paymentData.date_paid},
         ${paymentData.notes || null},
         ${paymentData.tenancy_id || null},
-        ${paymentData.unit_id || null}
+        ${paymentData.unit_id || null},
+        ${paymentData.payment_type_id || null}
       ) RETURNING *
     `;
 
-    return Response.json({ 
-      success: true, 
+    return Response.json({
+      success: true,
       payment_id: payment.id,
       linked_to_tenancy: !!payment.tenancy_id,
-      message: payment.tenancy_id ? "Payment linked to specific tenancy" : "Payment created without tenancy link"
+      message: payment.tenancy_id
+        ? "Payment linked to specific tenancy"
+        : "Payment created without tenancy link",
     });
-
   } catch (error) {
     console.error("POST /api/payments error:", error);
     return Response.json(
@@ -80,12 +91,12 @@ export async function GET(req) {
   const tenant_id = searchParams.get("tenant_id");
   const tenancy_id = searchParams.get("tenancy_id");
   const unit_id = searchParams.get("unit_id");
-  
+
   if (!id || isNaN(id)) {
     try {
       // Enhanced query supporting both legacy and new structure
       let payments;
-      
+
       if (tenant_id && tenancy_id && unit_id) {
         payments = await sql`
           SELECT 
@@ -192,7 +203,6 @@ export async function GET(req) {
         `;
       }
       return Response.json(payments);
-
     } catch (error) {
       console.error("GET /api/payments error:", error);
       return Response.json(

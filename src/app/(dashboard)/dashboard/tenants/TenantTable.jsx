@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function TenantTable({ tenants, onView, onDelete }) {
   const router = useRouter();
   console.log("Tenants:", tenants);
-  
+
   const handleView = (tenant) => {
     onView(tenant);
     const modal = new bootstrap.Modal(
@@ -15,17 +15,23 @@ export default function TenantTable({ tenants, onView, onDelete }) {
     );
     modal.show();
   };
-  
+
   const handleDelete = async (id) => {
     onDelete(id);
   };
 
   const getTenancyStatusBadge = (status) => {
     const statusMap = {
-      'HAS_ACTIVE_TENANCY': { class: 'bg-success text-white', text: 'Active Tenancy' },
-      'NO_UNIT': { class: 'bg-warning text-dark', text: 'No Unit' }
+      HAS_ACTIVE_TENANCY: {
+        class: "bg-success text-white",
+        text: "Active Tenancy",
+      },
+      NO_UNIT: { class: "bg-warning text-dark", text: "No Unit" },
     };
-    const statusInfo = statusMap[status] || { class: 'bg-secondary text-white', text: 'Unknown' };
+    const statusInfo = statusMap[status] || {
+      class: "bg-secondary text-white",
+      text: "Unknown",
+    };
     return (
       <span className={`badge ${statusInfo.class}`}>{statusInfo.text}</span>
     );
@@ -33,9 +39,9 @@ export default function TenantTable({ tenants, onView, onDelete }) {
 
   const getUnitInfo = (tenant) => {
     if (tenant.unit_id && tenant.unit_name) {
-      return `${tenant.unit_name} (${tenant.building_name || 'N/A'})`;
+      return `${tenant.unit_name} (${tenant.building_name || "N/A"})`;
     }
-    return 'No Unit Assigned';
+    return "No Unit Assigned";
   };
 
   return (
@@ -86,20 +92,22 @@ export default function TenantTable({ tenants, onView, onDelete }) {
                   )}
                 </td>
                 <td>
-                  <code className="text-success">{tenant.password_text || "N/A"}</code>
+                  <code className="text-success">
+                    {tenant.password_text || "N/A"}
+                  </code>
                 </td>
                 <td>
                   <Link
                     href={`/dashboard/tenants/${tenant.id}`}
                     className="btn btn-primary btn-sm me-1"
                   >
-                    Profile
+                    View
                   </Link>
                   <button
                     className="btn btn-sm btn-info me-1"
                     onClick={() => handleView(tenant)}
                   >
-                    Details
+                    Quick View
                   </button>
                   <Link
                     href={`/dashboard/tenants/edit/${tenant.id}`}
@@ -107,14 +115,6 @@ export default function TenantTable({ tenants, onView, onDelete }) {
                   >
                     Edit
                   </Link>
-                  {tenant.tenancy_status === 'HAS_ACTIVE_TENANCY' && (
-                    <Link
-                      href={`/dashboard/tenancies/tenant/${tenant.id}`}
-                      className="btn btn-success btn-sm me-1"
-                    >
-                      Tenancy
-                    </Link>
-                  )}
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => handleDelete(tenant.id)}

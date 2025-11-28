@@ -7,6 +7,7 @@ export default function PaymentForm() {
     amount: "",
     date: new Date().toISOString().substring(0, 10),
     notes: "",
+    payment_type_id: "",
   });
 
   const [tenants, setTenants] = useState([]);
@@ -16,9 +17,11 @@ export default function PaymentForm() {
   const [currentTenancy, setCurrentTenancy] = useState(null);
   const [activeTenancies, setActiveTenancies] = useState([]);
   const [selectedTenancyId, setSelectedTenancyId] = useState("");
+  const [paymentTypes, setPaymentTypes] = useState([]);
 
   useEffect(() => {
     fetchTenants();
+    fetchPaymentTypes();
   }, []);
   const fetchTenants = async () => {
     const res = await fetch("/api/tenants");
@@ -27,12 +30,30 @@ export default function PaymentForm() {
     setLoading(false);
   };
 
+  const fetchPaymentTypes = async () => {
+    try {
+      const res = await fetch("/api/payment_types");
+      if (res.ok) {
+        const data = await res.json();
+        setPaymentTypes(data || []);
+        if (data && data.length > 0 && !form.payment_type_id) {
+          setForm((prev) => ({ ...prev, payment_type_id: String(data[0].id) }));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch payment types:", err);
+    }
+  };
+
   const fetchCurrentTenancy = async (tenantId) => {
     try {
       const res = await fetch(`/api/tenancies/tenant/${tenantId}`);
       if (res.ok) {
         const data = await res.json();
-        const activeTenancies = data.tenancy_history?.filter(t => t.occupancy_status === 'active') || [];
+        const activeTenancies =
+          data.tenancy_history?.filter(
+            (t) => t.occupancy_status === "active"
+          ) || [];
         setActiveTenancies(activeTenancies);
 
         if (activeTenancies.length === 1) {
@@ -58,7 +79,7 @@ export default function PaymentForm() {
     if (name === "tenantId") {
       const tenant = tenants.find((t) => t.id === parseInt(value));
       setSelectedTenant(tenant || null);
-      
+
       if (tenant) {
         fetchCurrentTenancy(tenant.id);
       } else {
@@ -69,10 +90,11 @@ export default function PaymentForm() {
     }
 
     if (name === "selectedTenancyId") {
-        setSelectedTenancyId(value);
-        const tenancy = activeTenancies.find(t => t.id === parseInt(value));
-        setCurrentTenancy(tenancy || null);
+      setSelectedTenancyId(value);
+      const tenancy = activeTenancies.find((t) => t.id === parseInt(value));
+      setCurrentTenancy(tenancy || null);
     }
+    // payment_type_id will be handled by the generic setForm above
   };
 
   const handleSubmit = async (e) => {
@@ -88,7 +110,10 @@ export default function PaymentForm() {
         date_paid: form.date,
         notes: form.notes,
         tenancy_id: selectedTenancyId,
-        unit_id: currentTenancy ? currentTenancy.unit_id : null
+        unit_id: currentTenancy ? currentTenancy.unit_id : null,
+        payment_type_id: form.payment_type_id
+          ? parseInt(form.payment_type_id)
+          : null,
       }),
     });
 
@@ -100,6 +125,10 @@ export default function PaymentForm() {
         amount: "",
         date: new Date().toISOString().substring(0, 10),
         notes: "",
+        payment_type_id:
+          paymentTypes && paymentTypes.length > 0
+            ? String(paymentTypes[0].id)
+            : "",
       });
       setSelectedTenant(null);
       setActiveTenancies([]);
@@ -112,7 +141,11 @@ export default function PaymentForm() {
   };
 
   const paid = parseFloat(form.amount || 0);
-  const rent = currentTenancy?.monthly_rent || selectedTenant?.tenancy_rent || selectedTenant?.rent_amount_kes || 0;
+  const rent =
+    currentTenancy?.monthly_rent ||
+    selectedTenant?.tenancy_rent ||
+    selectedTenant?.rent_amount_kes ||
+    0;
   const difference = paid - rent;
 
   let statusMessage = "";
@@ -158,6 +191,26 @@ export default function PaymentForm() {
         </select>
       </div>
 
+      <div className="form-group mb-3">
+        <label>Payment Type (optional)</label>
+        <select
+          name="payment_type_id"
+          className="form-control"
+          value={form.payment_type_id}
+          onChange={handleChange}
+        >
+          <option value="">-- Select Payment Type (optional) --</option>
+          {paymentTypes.map((pt) => (
+            <option key={pt.id} value={pt.id}>
+              {pt.name}
+              {pt.type === "fixed" && pt.amount
+                ? ` (Ksh ${Number(pt.amount).toLocaleString()})`
+                : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {activeTenancies.length > 1 && (
         <div className="form-group mb-3">
           <label>Select Tenancy/Unit *</label>
@@ -171,11 +224,15 @@ export default function PaymentForm() {
             <option value="">-- Select a Unit --</option>
             {activeTenancies.map((tenancy) => (
               <option key={tenancy.id} value={tenancy.id}>
-                {tenancy.unit_name} ({tenancy.building_name}) - KES {Number(tenancy.monthly_rent).toLocaleString()}/month
+                {tenancy.unit_name} ({tenancy.building_name}) - KES{" "}
+                {Number(tenancy.monthly_rent).toLocaleString()}/month
               </option>
             ))}
           </select>
-          <small className="text-muted">This tenant has multiple active tenancies. Please select the one you want to record a payment for.</small>
+          <small className="text-muted">
+            This tenant has multiple active tenancies. Please select the one you
+            want to record a payment for.
+          </small>
         </div>
       )}
 
@@ -184,21 +241,27 @@ export default function PaymentForm() {
           {currentTenancy ? (
             <div className="card bg-light">
               <div className="card-body p-3">
-                <h6 className="card-title text-success">Current Active Tenancy</h6>
+                <h6 className="card-title text-success">
+                  Current Active Tenancy
+                </h6>
                 <p className="mb-1">
                   <strong>Unit:</strong> {currentTenancy.unit_name}
                   <br />
                   <strong>Building:</strong> {currentTenancy.building_name}
                   <br />
-                  <strong>Monthly Rent:</strong> Ksh {Number(currentTenancy.monthly_rent).toLocaleString()}
+                  <strong>Monthly Rent:</strong> Ksh{" "}
+                  {Number(currentTenancy.monthly_rent).toLocaleString()}
                   <br />
-                  <strong>Start Date:</strong> {new Date(currentTenancy.start_date).toLocaleDateString()}
+                  <strong>Start Date:</strong>{" "}
+                  {new Date(currentTenancy.start_date).toLocaleDateString()}
                   <br />
-                  <small className="text-muted">Duration: {currentTenancy.duration_days} days</small>
+                  <small className="text-muted">
+                    Duration: {currentTenancy.duration_days} days
+                  </small>
                 </p>
               </div>
             </div>
-          ) : selectedTenant.tenancy_status === 'HAS_ACTIVE_TENANCY' ? (
+          ) : selectedTenant.tenancy_status === "HAS_ACTIVE_TENANCY" ? (
             <div className="alert alert-info">
               <strong>Unit:</strong> {selectedTenant.unit_name || "N/A"}
               <br />
@@ -206,9 +269,12 @@ export default function PaymentForm() {
             </div>
           ) : (
             <div className="alert alert-warning">
-              <strong>No Active Tenancy:</strong> This tenant doesn't have an active unit assignment.
+              <strong>No Active Tenancy:</strong> This tenant doesn't have an
+              active unit assignment.
               <br />
-              <small>Payment will be recorded but not linked to a specific tenancy.</small>
+              <small>
+                Payment will be recorded but not linked to a specific tenancy.
+              </small>
             </div>
           )}
         </div>
@@ -256,7 +322,7 @@ export default function PaymentForm() {
       </div>
 
       <button className="btn btn-primary" disabled={loading || isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Submit Payment'}
+        {isSubmitting ? "Submitting..." : "Submit Payment"}
       </button>
     </form>
   );

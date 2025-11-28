@@ -51,6 +51,11 @@ export default function Sidebar() {
           >
             <i className="menu-icon tf-icons bx bx-folder" />
             <div data-i18n="Buildings">Buildings</div>
+            <i
+              className={`menu-toggle-icon bx bx-chevron-right ${
+                isBuildingsOpen ? "rotate-down" : ""
+              }`}
+            />
           </a>
           <ul className={`menu-sub ${isBuildingsOpen ? "d-block" : "d-none"}`}>
             <li
@@ -83,6 +88,11 @@ export default function Sidebar() {
           >
             <i className="menu-icon tf-icons bx bx-door-open" />
             <div data-i18n="Units">Units</div>
+            <i
+              className={`menu-toggle-icon bx bx-chevron-right ${
+                isUnitsOpen ? "rotate-down" : ""
+              }`}
+            />
           </a>
           <ul className={`menu-sub ${isUnitsOpen ? "d-block" : "d-none"}`}>
             <li
@@ -115,6 +125,11 @@ export default function Sidebar() {
           >
             <i className="menu-icon tf-icons bx bx-user" />
             <div data-i18n="Tenants">Tenants</div>
+            <i
+              className={`menu-toggle-icon bx bx-chevron-right ${
+                isTenantsOpen ? "rotate-down" : ""
+              }`}
+            />
           </a>
           <ul className={`menu-sub ${isTenantsOpen ? "d-block" : "d-none"}`}>
             <li
@@ -156,6 +171,11 @@ export default function Sidebar() {
           >
             <i className="menu-icon tf-icons bx bx-crown" />
             <div data-i18n="Owners">Owners</div>
+            <i
+              className={`menu-toggle-icon bx bx-chevron-right ${
+                isOwnersOpen ? "rotate-down" : ""
+              }`}
+            />
           </a>
           <ul className={`menu-sub ${isOwnersOpen ? "d-block" : "d-none"}`}>
             <li
@@ -187,6 +207,11 @@ export default function Sidebar() {
           >
             <i className="menu-icon tf-icons bx bx-money" />
             <div data-i18n="Payments">Payments</div>
+            <i
+              className={`menu-toggle-icon bx bx-chevron-right ${
+                isPaymentsOpen ? "rotate-down" : ""
+              }`}
+            />
           </a>
           <ul className={`menu-sub ${isPaymentsOpen ? "d-block" : "d-none"}`}>
             <li
@@ -207,6 +232,24 @@ export default function Sidebar() {
                 <div data-i18n="View Payments">View Payments</div>
               </Link>
             </li>
+            <li
+              className={`menu-item ${
+                pathname === "/dashboard/payment_types/add" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/payment_types/add" className="menu-link">
+                <div data-i18n="Add Payment Type">Add Payment Type</div>
+              </Link>
+            </li>
+            <li
+              className={`menu-item ${
+                pathname === "/dashboard/payment_types" ? "active" : ""
+              }`}
+            >
+              <Link href="/dashboard/payment_types" className="menu-link">
+                <div data-i18n="View Payment Types">View Payment Types</div>
+              </Link>
+            </li>
           </ul>
         </li>
         {/* Maintenance */}
@@ -218,6 +261,11 @@ export default function Sidebar() {
           >
             <i className="menu-icon tf-icons bx bx-wrench" />
             <div data-i18n="Maintenance">Maintenance</div>
+            <i
+              className={`menu-toggle-icon bx bx-chevron-right ${
+                isMaintenanceOpen ? "rotate-down" : ""
+              }`}
+            />
           </a>
           <ul
             className={`menu-sub ${isMaintenanceOpen ? "d-block" : "d-none"}`}
